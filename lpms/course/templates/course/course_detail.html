@@ -1,0 +1,102 @@
+{% extends "dashboard_panels.html" %}
+
+{% block head_title %}
+{{ course.name }}
+{% endblock head_title %}
+
+{% block leftpanel %}
+
+<div class="row">
+    <div class="col">
+        <div class="card mb-3">
+            <div class="card-header">
+            Курсы Moscow Python
+            </div>
+            <div class="card-body ps-0 pe-0 pt-0 pb-1">
+                {% if not courses %}
+                <div class="alert alert-warning m-3" role="alert">
+                  Не удалось загрузить список курсов 🥲
+                </div>
+                {% else %}
+                <ul class="list-group list-group-flush">
+                    {% for crs in courses %}
+                        {% if crs == course %}
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <strong>{{ crs.name }}</strong>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'home' %}?course={{crs.pk}}" class="list-group-item list-group-item-action">
+                            {{ crs.name }}
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+            Об LPMS
+            </div>
+            <div class="card-body">
+                <p>
+                    <b>Learn Python. Management system (LPMS)</b> - это система управления обучением 
+                    для курсов от сообщества MOSCOW PYTHON, 
+                    которая помогает организовать образовательный процесс курсов программирования 
+                    Learn Python и Learn Python Advanced.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block rightpanel %}
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header pb-0 ">
+            <h3 class="fw-light">{{course}}</h3>
+            </div>
+            <div class="card-body">
+                {{content|safe}}
+                <ul class="nav nav-tabs" id="TracksTab" role="tablist">
+                    {% for track in tracks%}
+                    <li class="nav-item " role="presentation">
+
+                      <button 
+                              {% if forloop.counter == 1 %}
+                              class="nav-link active"
+                              {% else %}
+                              class="nav-link"
+                              {% endif %}
+                              id="{{ forloop.counter }}-tab" data-bs-toggle="tab" 
+                              data-bs-target="#{{ forloop.counter }}-tab-pane" type="button" role="tab" 
+                              aria-controls="{{ forloop.counter }}-tab-pane" aria-selected="true">
+                        {{track.name}}
+                      </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="tab-content pt-3" id="TracksTabContent">
+                    {% for track, track_content in tracks.items%}
+                       {% if forloop.counter == 1 %}
+                       <div class="tab-pane fade show active" id="{{ forloop.counter }}-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                          {{track_content|safe}}
+                       </div>
+                       {% else %}
+                       <div class="tab-pane fade show" id="{{ forloop.counter }}-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                          {{track_content|safe}}
+                       </div>
+                       {% endif %}
+                    
+                    {% endfor %}
+                </div>
+            </div>
+          </div>
+    </div>
+</div>
+{% block content %}
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "dashboard_fullscreen.html" %}
+
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+    {% trans "Sign In" %}
+{% endblock head_title %}
+
+{% block panel %}
+
+<div class="row">
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-header">
+                Вход на портал
+            </div>
+            <div class="card-body">
+
+                {% if process == "connect" %}
+
+                <h5 class="card-title">
+                    {% blocktrans with provider.name as provider %}Connect {{ provider }}{%endblocktrans %}
+                </h5>
+                <p class="card-text">
+                    {% blocktrans with provider.name as provider %}You are about to connect a new third-party account from {{ provider }}.{% endblocktrans %}
+                </p>
+
+                {% else %}
+
+                <h5 class="card-title">
+                    {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{%endblocktrans %}
+                </h5>
+                <p class="card-text">
+                    {% blocktrans with provider.name as provider %}You are about to sign in using a third-party account from {{ provider }}.{% endblocktrans %}
+                </p>
+                {% endif %}
+
+                {% element form method="post" no_visible_fields=True %}
+                    {% slot actions %}
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Продолжить</button>
+                    {% endslot %}
+                {% endelement %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock panel %}

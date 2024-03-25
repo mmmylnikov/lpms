@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block dashboard %}
+<div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
+    <div class="bg-body-tertiary border rounded-3 p-3">
+        {% block leftpanel %}
+        {% endblock %}
+    </div>
+    <div class="bg-body-tertiary border rounded-3 p-3">
+        {% block rightpanel %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
