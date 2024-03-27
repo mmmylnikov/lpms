@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     'user.apps.UserConfig',
     'course.apps.CourseConfig',
     'learn.apps.LearnConfig',
+    'dashboard.apps.DashboardConfig',
     # Django
     'django.contrib.admin',
     'django.contrib.auth',

@@ -5,6 +5,6 @@ urlpatterns = [
     path('', include('course.urls')),
     path('admin/', admin.site.urls),
     path('users/', include('user.urls')),
-    # path('dashboard/', include('dashboard.urls')),  # todo
+    path('dashboard/', include('dashboard.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
 ]
