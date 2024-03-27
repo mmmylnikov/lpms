@@ -4,6 +4,7 @@ from django.views.generic.edit import UpdateView
 
 from user.models import User
 from user.forms import UserUpdateForm
+from learn.meta import LearnMeta
 
 
 class UserDetailView(DetailView):
@@ -14,7 +15,7 @@ class UserDetailView(DetailView):
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
-        context["teams"] = self.object.team_set.all()
+        context["learn_meta"] = LearnMeta(user=self.get_object()).get_teams()
         return context
 
 

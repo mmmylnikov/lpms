@@ -11,68 +11,12 @@
 {% get_social_accounts user as accounts %}
 <div class="row">
     <div class="col">
-        <div class="card shadow-sm ">
-            <img src="{{accounts.github.0.extra_data.avatar_url}}" class="card-img-top" alt="user_avatar">
-            <div class="card-body">
-                <h3>{{ user.get_full_name }}</h3>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span class="bi bi-person-circle"> Username</span>
-                        <span class="badge text-bg-light rounded-pill">{{ user.username}}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span class="bi bi-github"> GitHub</span>
-                        <span class="badge text-bg-light rounded-pill">
-                            <a href="{{accounts.github.0.extra_data.html_url}}" target="_blank">
-                                {{accounts.github.0.extra_data.login}}
-                            </a>
-                        </span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span class="bi bi-telegram"> Telegram</span>
-                        <span class="badge text-bg-light rounded-pill">
-                            <a href="https://t.me/{{user.tg_username}}" target="_blank">
-                                {{user.tg_username}}
-                            </a>
-                        </span>
-                    </li>
-                </ul>
-                <div class="d-flex justify-content-between align-items-center pt-2">
-                    <div class="btn-group">
-                        {% if user == request.user %}
-                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                            data-bs-target="#modalUserUpdate">
-                            Редактировать
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'user/user_meta.html'%}
     </div>
 </div>
 
 {% if user == request.user %}
-<!-- Modal User Update -->
-<div class="modal fade" id="modalUserUpdate" tabindex="-1" aria-labelledby="modalUserUpdateLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Редактировать профиль</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div hx-get="{% url 'user_update_view' request.user.username %}" hx-trigger="load" hx-swap="innerHTML">
-                    User
-                    Update Form</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отменить</button>
-                <button type="submit" class="btn btn-primary btn-sm" form="UserUpdateForm"">Сохранить изменения</button>
-        </div>
-        </div>
-    </div>
-</div>
+    {% include 'user/user_update_modal.html'%}
 {% endif %}
 
 {% endblock %}
@@ -81,30 +25,8 @@
 {% block rightpanel %}
 <div class=" row">
     <div class="col">
-        <div class="card">
-            <div class="card-header">
-                Мои курсы
-            </div>
-            <div class="card-body ps-0 pe-0 pt-0 pb-1">
-                {% if not teams%}
-                <div class="alert alert-warning m-3" role="alert">
-                    Похоже, у меня пока нет активных курсов 🥲
-                </div>
-                {% else %}
-                <ul class="list-group list-group-flush">
-                    {% for team in teams %}
-                    <li class="list-group-item">
-                        {{team.enrollment.course}} - {{ team.enrollment }}
-                        (куратор 
-                        <a href="{% url 'user_detail_view' team.tutor.username %}">
-                            {{team.tutor.get_full_name}}
-                        </a>)
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-        </div>
+        {% include 'user/list_teams_learn.html' %}
+        {% include 'user/list_teams_review.html' %}
     </div>
 </div>
 {% endblock %}

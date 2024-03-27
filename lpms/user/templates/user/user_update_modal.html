@@ -1,0 +1,20 @@
+<!-- Modal User Update -->
+<div class="modal fade" id="modalUserUpdate" tabindex="-1" aria-labelledby="modalUserUpdateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Редактировать профиль</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div hx-get="{% url 'user_update_view' request.user.username %}" hx-trigger="load" hx-swap="innerHTML">
+                    User
+                    Update Form</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отменить</button>
+                <button type="submit" class="btn btn-primary btn-sm" form="UserUpdateForm"">Сохранить изменения</button>
+        </div>
+        </div>
+    </div>
+</div>
