@@ -61,6 +61,10 @@ class Team(models.Model):
     def name(self) -> str:
         return f'{self.enrollment.slug} (куратор {self.tutor.get_full_name()})'
 
+    @property
+    def slug(self) -> str:
+        return f'{self.enrollment.slug}_{self.pk}'.lower()
+
     def __str__(self) -> str:
         return self.name
 
@@ -85,5 +89,5 @@ class Track(models.Model):
     class Meta:
         verbose_name = 'Трек'
         verbose_name_plural = 'Треки'
-        ordering = ('name', )
+        ordering = ('created_at', )
         get_latest_by = 'created_at'

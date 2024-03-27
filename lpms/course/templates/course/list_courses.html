@@ -1,0 +1,26 @@
+<div class="card mb-3">
+    <div class="card-header">
+    Курсы Moscow Python
+    </div>
+    <div class="card-body ps-0 pe-0 pt-0 pb-1">
+        {% if not courses %}
+        <div class="alert alert-warning m-3" role="alert">
+          Не удалось загрузить список курсов 🥲
+        </div>
+        {% else %}
+        <ul class="list-group list-group-flush">
+            {% for crs in courses %}
+                {% if crs == course %}
+                <a href="#" class="list-group-item list-group-item-action">
+                    <strong>{{ crs.name }}</strong>
+                </a>
+                {% else %}
+                <a href="{% url 'home' %}?course={{crs.pk}}" class="list-group-item list-group-item-action">
+                    {{ crs.name }}
+                </a>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
