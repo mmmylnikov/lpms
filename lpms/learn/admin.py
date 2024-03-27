@@ -1,30 +1,48 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 
 from learn.models import Lesson, Challenge, Homework, Week, Program
 
 
-class LessonAdmin(admin.ModelAdmin):
+class AddedFieldAdminMixin:
+    def added(self, object: Lesson | Challenge | Week | Program) -> str:
+        return object.added
+    added.short_description = 'Материалы'  # type: ignore
+    """
+    for ("# type: ignore"): I don't know how to resolve it:
+    ----------------------------------------------------------------
+    mypy: learn/admin.py:10: error: "Callable[[AddedFieldAdminMixin,
+    Lesson | Challenge | Week | Program], str]" has no attribute
+    "short_description"  [attr-defined]
+    ----------------------------------------------------------------
+    """
+
+
+class LessonAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
+                  admin.ModelAdmin):
     list_display = ('track', 'name', 'added')
     list_display_links = ('name',)
     list_filter = ('track', 'track__course', )
     ordering = ('track', 'created_at',)
 
 
-class ChallengeAdmin(admin.ModelAdmin):
+class ChallengeAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
+                     admin.ModelAdmin):
     list_display = ('track', 'name', 'added')
     list_display_links = ('name',)
     list_filter = ('track', 'track__course', )
     ordering = ('track', 'created_at',)
 
 
-class HomeworkAdmin(admin.ModelAdmin):
+class HomeworkAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('updated_at', 'сhallenge', 'user')
     list_display_links = ('user',)
     list_filter = ('сhallenge__track', )
     ordering = ('сhallenge', 'user')
 
 
-class WeekAdmin(admin.ModelAdmin):
+class WeekAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
+                admin.ModelAdmin):
     list_display = ('course', 'number', 'added')
     list_display_links = ('number',)
     list_filter = ('course', )
@@ -32,7 +50,8 @@ class WeekAdmin(admin.ModelAdmin):
     ordering = ('course', 'number')
 
 
-class ProgramAdmin(admin.ModelAdmin):
+class ProgramAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
+                   admin.ModelAdmin):
     list_display = ('course', 'name', 'added')
     list_display_links = ('name',)
     list_filter = ('course', )

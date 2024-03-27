@@ -1,4 +1,5 @@
 from django.db import models
+from markdown import markdown
 
 from user.models import User
 from course.models import Track, Course, Enrollment
@@ -21,6 +22,12 @@ class Lesson(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
     @property
+    def video_uid(self) -> str | None:
+        if not self.video:
+            return None
+        return self.video.replace('https://www.youtube.com/watch?v=', '')
+
+    @property
     def added(self) -> str:
         output = []
         if self.content:
@@ -34,8 +41,6 @@ class Lesson(models.Model):
         if self.url:
             output.append('Л')
         return ', '.join(output)
-
-    added.fget.short_description = 'Материалы'  # type: ignore
 
     def __str__(self) -> str:
         return f'{self.track} - {self.name}'
@@ -60,6 +65,11 @@ class Challenge(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
     @property
+    def content_markdown(self) -> str:
+        content = self.content if self.content else ''
+        return markdown(content)
+
+    @property
     def added(self) -> str:
         output = []
         if self.content:
@@ -69,8 +79,6 @@ class Challenge(models.Model):
         if self.url:
             output.append('Л')
         return ', '.join(output)
-
-    added.fget.short_description = 'Материалы'  # type: ignore
 
     def __str__(self) -> str:
         return f'{self.track} - {self.name}'
@@ -83,13 +91,13 @@ class Challenge(models.Model):
 
 
 class Homework(models.Model):
-    status_choices = {
-        "available": "Доступно к выполнению",
-        "execution": "Выполнение",
-        "review": "На проверке",
-        "correction": "Требует исправлений",
-        "approved": "Принято",
-    }
+    status_choices = (
+        ("available", "Доступно к выполнению"),
+        ("execution", "Выполнение"),
+        ("review", "На проверке"),
+        ("correction", "Требует исправлений"),
+        ("approved", "Принято"),
+    )
     user = models.ForeignKey(User, on_delete=models.PROTECT,
                              verbose_name='Пользователь')
     сhallenge = models.ForeignKey(Challenge, on_delete=models.PROTECT,
@@ -119,10 +127,17 @@ class Week(models.Model):
     number = models.PositiveSmallIntegerField(verbose_name='Номер')
     description = models.TextField(null=True, blank=True,
                                    verbose_name='Комментарий')
-    lessons = models.ManyToManyField(Lesson, verbose_name='Уроки')
-    challenges = models.ManyToManyField(Challenge, verbose_name='Задания')
+    lessons = models.ManyToManyField(Lesson, verbose_name='Уроки', blank=True)
+    challenges = models.ManyToManyField(Challenge, verbose_name='Задания',
+                                        blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
+
+    @property
+    def description_markdown(self) -> str:
+        if self.description:
+            return markdown(self.description)
+        return ''
 
     @property
     def added(self) -> str:
@@ -132,8 +147,6 @@ class Week(models.Model):
         if self.challenges:
             output.append(f'З:{self.challenges.count()}')
         return ', '.join(output)
-
-    added.fget.short_description = 'Материалы'  # type: ignore
 
     def __str__(self) -> str:
         return f'{self.course} #{self.number}'
@@ -164,8 +177,6 @@ class Program(models.Model):
         if self.enrollments:
             output.append(f'П:{self.enrollments.count()}')
         return ', '.join(output)
-
-    added.fget.short_description = 'Материалы'  # type: ignore
 
     def __str__(self) -> str:
         return f'{self.name}'
