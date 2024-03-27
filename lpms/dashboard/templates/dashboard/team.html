@@ -1,0 +1,23 @@
+<div class="card">
+    <div class="card-header  ">
+        <div class="row">
+            <div class="col">
+                {{ learn_meta.enrollment }} 
+                <span class="fw-lighter">| {{ learn_meta.course }} </span>
+                
+            </div>
+            <div class="col text-end"> 
+                <small class="fw-lighter">неделя {{ learn_meta.week_current_number }}/{{ learn_meta.weeks.count }} |</small>
+                <small class="fw-lighter">куратор 
+                    <a href="{% url 'user_detail_view' learn_meta.tutor.username %}">{{ learn_meta.tutor.get_full_name }}</a>
+                </small>
+            </div>
+        </div>
+        
+    </div>
+    <div class="card-body">
+        {% include 'dashboard/list_week.html' %}
+        {{learn_meta.week.description_markdown|safe}}
+        {% include 'dashboard/list_track.html' %}
+    </div>
+</div>

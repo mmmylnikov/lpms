@@ -1,0 +1,24 @@
+{% extends "dashboard_panels.html" %}
+
+{% block head_title %}
+{% endblock head_title %}
+
+{% block leftpanel %}
+
+<div class="row">
+    <div class="col">
+        {% include 'user/list_teams_learn.html' %}
+        {% include 'user/list_teams_review.html' %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block rightpanel %}
+<div class="row">
+    <div class="col">
+        {% include 'dashboard/team.html' %}
+    </div>
+</div>
+
+{% endblock %}
