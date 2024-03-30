@@ -1,8 +1,10 @@
 from django.db import models
+from django.urls import reverse_lazy
 from markdown import markdown
 
 from user.models import User
-from course.models import Track, Course, Enrollment
+from course.models import Track, Course, Enrollment, Team
+from learn.enums import HomeworkStatuses
 
 
 class Lesson(models.Model):
@@ -90,37 +92,6 @@ class Challenge(models.Model):
         get_latest_by = 'created_at'
 
 
-class Homework(models.Model):
-    status_choices = (
-        ("available", "Доступно к выполнению"),
-        ("execution", "Выполнение"),
-        ("review", "На проверке"),
-        ("correction", "Требует исправлений"),
-        ("approved", "Принято"),
-    )
-    user = models.ForeignKey(User, on_delete=models.PROTECT,
-                             verbose_name='Пользователь')
-    сhallenge = models.ForeignKey(Challenge, on_delete=models.PROTECT,
-                                  verbose_name='Задание')
-    comment = models.TextField(null=True, blank=True,
-                               verbose_name='Комментарий')
-    repo = models.CharField(max_length=512, null=True, blank=True,
-                            verbose_name='Репозиторий')
-    status = models.CharField(max_length=11, choices=status_choices,
-                              verbose_name='Статус')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
-
-    def __str__(self) -> str:
-        return f'{self.сhallenge} ({self.user.get_full_name()})'
-
-    class Meta:
-        verbose_name = 'Работа'
-        verbose_name_plural = 'Работы'
-        ordering = ('-created_at', )
-        get_latest_by = 'created_at'
-
-
 class Week(models.Model):
     course = models.ForeignKey(Course, on_delete=models.PROTECT,
                                verbose_name='Курс')
@@ -155,6 +126,57 @@ class Week(models.Model):
         verbose_name = 'Неделя'
         verbose_name_plural = 'Недели'
         ordering = ('course', 'number')
+        get_latest_by = 'created_at'
+
+
+class Homework(models.Model):
+    status_choices = (
+        (status.value.name, status.value.label) for status in HomeworkStatuses
+    )
+    user = models.ForeignKey(User, on_delete=models.PROTECT,
+                             verbose_name='Пользователь')
+    сhallenge = models.ForeignKey(Challenge, on_delete=models.PROTECT,
+                                  verbose_name='Задание')
+    comment = models.TextField(null=True, blank=True,
+                               verbose_name='Комментарий')
+    repo = models.CharField(max_length=512, null=True, blank=True,
+                            verbose_name='Репозиторий')
+    status = models.CharField(max_length=11, choices=status_choices,
+                              default='available',
+                              verbose_name='Статус')
+    week = models.ForeignKey(Week, on_delete=models.PROTECT,
+                             verbose_name='Неделя')
+    team = models.ForeignKey(Team, on_delete=models.PROTECT,
+                             verbose_name='Группа')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
+
+    def __str__(self) -> str:
+        return f'{self.сhallenge} ({self.user.get_full_name()})'
+
+    @property
+    def status_icon(self) -> str:
+        return HomeworkStatuses[self.status].value.icon
+
+    @property
+    def status_label(self) -> str:
+        return HomeworkStatuses[self.status].value.label
+
+    @property
+    def status_color(self) -> str:
+        return HomeworkStatuses[self.status].value.color
+
+    def get_student_absolute_url(self) -> str:
+        return reverse_lazy("student_task_view", kwargs={
+            'week_number': self.week.number,
+            'team_slug': self.team.slug,
+            'сhallenge_id': self.сhallenge.pk,
+            })
+
+    class Meta:
+        verbose_name = 'Работа'
+        verbose_name_plural = 'Работы'
+        ordering = ('-created_at', )
         get_latest_by = 'created_at'
 
 
