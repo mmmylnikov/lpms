@@ -18,6 +18,7 @@ class CourseDetailView(TemplateView):
         if course:
             tracks = course.track_set.all().order_by('created_at')
             context.update({
+                'course': course,
                 'content': markdown(course.description),
                 'tracks': {
                     track: markdown(track.description) for track in tracks},
