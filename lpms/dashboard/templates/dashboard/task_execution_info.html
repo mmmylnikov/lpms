@@ -1,0 +1,39 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title">Как выполнять</h5>
+            <span>
+                {% if challenge.repo %}
+                <button type="button" class="btn btn-light btn-sm " 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        data-bs-title="Особенности выполнения читайте в README.md в репозитории с файлами задания (при наличии)">
+                    <i class="bi bi-info-circle "></i>
+                    <small class="fw-lighter"> стандартная инструкция</small>
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-warning btn-sm " 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        data-bs-title="Особенности выполнения читайте в комментарии к заданию">
+                    <i class="bi bi-info-circle "></i>
+                    <small class="fw-lighter"> нестандартная инструкция</small>
+                </button>
+                {% endif %}
+            </span>
+        </div>
+        <p class="card-text">
+            <ul class="list-group list-group-flush list-group-numbered m-0">
+                {% if challenge.repo %}
+                <li class="list-group-item">Форкнуть себе репозиторий</li>
+                <li class="list-group-item">Создать и перейти в бранч level_{номер_левела}</li>
+                {% else %}
+                <li class="list-group-item">Создать репозиторий</li>
+                <li class="list-group-item">Создать и перейти в бранч разработки</li>
+                {% endif %}
+                <li class="list-group-item">Выполнить упражнения из задания</li>
+                <li class="list-group-item">Сделать пул-реквест в свой репозиторий</li>
+                <li class="list-group-item">Сдать куратору на проверку ссылку на пул-реквест (через форму ниже)</li>
+                <li class="list-group-item">Как только куратор аппрувнул пул-реквест, вмерджить его в main</li>
+            </ul>
+        </p>                
+    </div>
+</div>

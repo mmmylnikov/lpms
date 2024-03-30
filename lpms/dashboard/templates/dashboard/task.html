@@ -18,7 +18,11 @@
 {% block rightpanel %}
 <div class="row">
     <div class="col">
-        {% include 'dashboard/team.html' %}
+        <div class="collapse" id="collapseLessons">
+                {% include 'dashboard/list_lesson.html' %}
+        </div>
+        {% include 'dashboard/task_student.html' %}    
+        {% include 'dashboard/task_execution.html' %}       
     </div>
 </div>
 

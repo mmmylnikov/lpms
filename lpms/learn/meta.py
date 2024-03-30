@@ -6,13 +6,15 @@ from django.contrib.auth.models import AnonymousUser
 
 from user.models import User
 from course.models import Team, Enrollment, Course, Track
-from learn.models import Program, Week, Lesson, Challenge
+from learn.models import Program, Week, Lesson, Challenge, Homework
+from learn.enums import HomeworkStatuses
 
 
 class LearnMeta:
     user: User | AnonymousUser
     teams_learn: QuerySet[Team] | None
     teams_review: QuerySet[Team] | None
+    tasks_learn: QuerySet[Homework] | None
 
     def __init__(self, user: User | AnonymousUser) -> None:
         self.user = user
@@ -34,6 +36,15 @@ class LearnMeta:
     def get_teams(self) -> Self:
         self.get_teams_learn()
         self.get_teams_review()
+        return self
+
+    def get_tasks_learn(self) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        self.tasks_learn = Homework.objects.filter(
+            user=self.user).exclude(status__in=[
+                HomeworkStatuses.approved.name,
+                HomeworkStatuses.available.name])
         return self
 
 

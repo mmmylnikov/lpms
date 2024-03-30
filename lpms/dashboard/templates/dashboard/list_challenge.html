@@ -13,16 +13,22 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <h5 class="card-title">{{ challenge.name }}</h5>
-                                    {% if challenge.repo or challenge.url %}
-                                    <div class="btn-group" role="group">
-                                        {% if challenge.repo %}
-                                        <a href="{{challenge.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
+                                    <span>
+                                        {% if challenge.repo or challenge.url %}
+                                        <div class="btn-group" role="group">
+                                            {% if challenge.repo %}
+                                            <a href="{{challenge.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
+                                            {% endif %}
+                                            {% if challenge.url %}
+                                            
+                                            {% endif %}
+                                        </div>
                                         {% endif %}
-                                        {% if challenge.url %}
-                                        <a href="{{challenge.url}}" target="_blank" class="btn btn-info btn-sm"><i class="bi bi-link"></i> ссылка</a>
-                                        {% endif %}
-                                    </div>
-                                    {% endif %}
+                                        <a href="{% url 'student_task_view' week.number learn_meta.team.slug challenge.pk %}" class="btn btn-success btn-sm">
+                                            <i class="bi bi-laptop"></i>
+                                            выполнить
+                                        </a>
+                                    </span>
                                 </div>
                                 {% if challenge.content %}
                                 <p class="card-text">{{challenge.content_markdown|safe}}</p>

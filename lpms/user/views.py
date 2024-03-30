@@ -15,7 +15,8 @@ class UserDetailView(DetailView):
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
-        context["learn_meta"] = LearnMeta(user=self.get_object()).get_teams()
+        context["learn_meta"] = LearnMeta(
+            user=self.get_object()).get_teams().get_tasks_learn()
         return context
 
 

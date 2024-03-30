@@ -1,10 +1,16 @@
 from enum import Enum
+from typing import Any
 
-from django.views.generic import TemplateView
+from django.forms import BaseModelForm
+from django.views.generic import TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from django.http import HttpRequest, HttpResponse
 
 from course.models import Team
-from learn.models import Lesson, Challenge
+from learn.models import Lesson, Challenge, Track, Homework
+from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta
 
 
@@ -67,3 +73,78 @@ class ContentView(TemplateView):
             'content_data': content_data,
         })
         return context
+
+
+class TaskViewMixin(TemplateView):
+    template_name = "dashboard/task.html"
+    challenge: Challenge
+    track: Track
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        challenge_id = str(kwargs['сhallenge_id'])
+        self.challenge = Challenge.objects.get(pk=challenge_id)
+        self.track = self.challenge.track
+        context.update({
+            'challenge': self.challenge,
+            'track': self.track,
+        })
+        return context
+
+
+class StudentTaskView(TaskViewMixin, StudentDashboardView):
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        task, created = Homework.objects.get_or_create(
+            user=self.request.user,
+            сhallenge=context['challenge'],
+            week=context['week'],
+            team=self.team,
+        )
+        if created:
+            task.status = 'execution'
+            task.save()
+        context.update({
+            'task': task,
+            'status_sending': 'review',
+        })
+        return context
+
+
+class TaskUpdateView(UpdateView):
+    model = Homework
+    form_class = TaskUpdateForm
+    template_name = 'dashboard/task_update_form.html'
+
+    def set_obj_status(self, status: str | None) -> Homework:
+        obj = self.get_object()
+        obj.status = status
+        obj.save()
+        return obj
+
+    def get_success_url(self) -> str:
+        return self.request.GET.get('redirect_url', '/')
+
+    def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['status_sending'] = self.request.GET.get('status_sending')
+        return context
+
+    def post(self,
+             request: HttpRequest, *args: str,
+             **kwargs: reverse_lazy) -> HttpResponse:
+        status_sending = self.request.POST.get('status_sending')
+        if self.request.POST.get('status_sending') == 'available':
+            self.set_obj_status(status=status_sending)
+            return redirect(self.get_success_url())
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        response = super().form_valid(form)
+        status_sending = self.request.POST.get('status_sending', )
+        self.set_obj_status(status=status_sending)
+        return response
+
+
+class TutorTaskView(TaskViewMixin, TutorDashboardView):
+    pass

@@ -1,0 +1,25 @@
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title">Сдать работу на проверку</h5>
+            <span>
+                <button type="button" class="btn btn-light btn-sm " 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        data-bs-title="Дата последнего обновления">
+                        <i class="bi bi-calendar3"></i>
+                    <small class="fw-lighter"> {{ task.updated_at|date:"d.m.Y H:i" }}</small>
+                </button>
+            </span>
+        </div>
+        <p class="card-text">
+  
+            <div hx-get="{% url 'task_update_view' task.pk%}?status_sending={{status_sending}}&redirect_url={{request.META.HTTP_REFERER}}" 
+                 hx-trigger="load" hx-swap="innerHTML">
+                Task
+                Update Form
+            </div>
+        </p>                
+    </div>
+</div>
