@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group as AbstractGroup
+from django.urls import reverse_lazy
 
 from user.enums import GroupEnum
 
@@ -41,3 +42,6 @@ class User(AbstractUser):
         if self.groups.filter(pk=GroupEnum.GROUP_TUTOR_ID.value).count() > 0:
             return f'{output} (куратор)'
         return output
+
+    def get_absolute_url(self) -> str:
+        return reverse_lazy("user_detail_view", kwargs={'slug': self.username})

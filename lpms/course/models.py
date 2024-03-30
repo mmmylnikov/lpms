@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls import reverse_lazy
+
 
 from user.models import User
 
@@ -15,6 +17,9 @@ class Course(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_absolute_url(self) -> str:
+        return f'{reverse_lazy("home")}?course={self.pk}'
 
     class Meta:
         verbose_name = 'Курс'
