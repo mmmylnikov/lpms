@@ -23,10 +23,7 @@ jobs:
           python-version: '3.12'  
       - name: Install requirements
         run: pip install -r requirements_dev.txt
-      - run: cd lpms/
-      - run: pwd
       - name: Run flake8
         run: flake8 .
-      - run: pwd
       - name: Run mypy
         run: mypy .
