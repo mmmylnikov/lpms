@@ -8,6 +8,12 @@ on:
 
 jobs:
   lint:
+    env:
+      DEBUG: ${{ vars.DEBUG }}
+      ALLOWED_HOSTS: ${{ vars.ALLOWED_HOSTS }}
+      GITHUB_OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+      GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+      GITHUB_OAUTH_REDIRECT_URL: ${{ secrets.OAUTH_REDIRECT_URL }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
