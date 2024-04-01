@@ -1,0 +1,24 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'  
+      - name: Install requirements
+        run: pip install -r requirements_dev.txt
+      - run: cd lpms/
+      - name: Run flake8
+        run: flake8 .
+      - name: Run mypy
+        run: mypy .
