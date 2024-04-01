@@ -1,13 +1,14 @@
 {% if content_type == 'video' %}
 
-<div class="modal-dialog modal-dialog-centered">
+<div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">{{ obj.name }}</h5>
         </div>
         <div class="modal-body">
             <div>
-                <iframe height="100%" width="100%" src="https://www.youtube.com/embed/{{video_uid}}" frameborder="0"
+                <iframe height="100%" width="100%" src="https://www.youtube.com/embed/{{video_uid}}" 
+                        frameborder="0" style="min-height: 360px;"
                     allowfullscreen>
                 </iframe>
             </div>
