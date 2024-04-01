@@ -1,0 +1,28 @@
+{% extends "dashboard_panels.html" %}
+
+{% block head_title %}
+{{ course.name }}
+{% endblock head_title %}
+
+{% block leftpanel %}
+
+<div class="row">
+    <div class="col">
+        {% include 'course/list_courses.html' %}
+        {% include 'course/lpms_about.html' %}
+        {% if learn_meta %}
+            {% include 'user/list_teams_learn.html' %}
+            {% include 'user/list_teams_review.html' %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block rightpanel %}
+<div class="row">
+    <div class="col">
+        {% include 'course/course_meta.html' %}
+    </div>
+</div>
+{% endblock %}

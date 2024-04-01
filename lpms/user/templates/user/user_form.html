@@ -1,0 +1,5 @@
+<form method="post" id="UserUpdateForm" action="{% url 'user_update_view' request.user.username %}">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{form.as_p}}
+</form>

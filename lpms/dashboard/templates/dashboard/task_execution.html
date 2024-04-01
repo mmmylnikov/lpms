@@ -1,0 +1,30 @@
+<div class="card mb-3">
+    <div class="card-header bg-{{task.status_color}}-subtle">
+        <div class="row">
+            <div class="col">
+                Выполнение                
+            </div>
+            <div class="col text-end"> 
+                <small class="fw-lighter">
+                    {{task.status_label}}  <i class="{{task.status_icon}}"></i>
+                </small>
+            </div>
+        </div>
+        
+    </div>
+    <div class="card-body">
+        {% include 'dashboard/task_execution_info.html' %}
+        {% include 'dashboard/task_execution_form.html' %}
+    </div>
+    
+</div>
+
+
+
+<!-- <div>
+    <p>"available" <span class="badge text-bg-secondary"><i class="bi bi-square"></i></span></p>
+    <p>"execution" <span class="badge text-bg-danger"><i class="bi bi-pencil-square"></i></span></p>
+    <p>"review" <span class="badge text-bg-info"><i class="bi bi-r-square"></i></span></p>
+    <p>"correction" <span class="badge text-bg-warning"><i class="bi bi-exclamation-square"></i></span></p>
+    <p>"approved" <span class="badge text-bg-success"><i class="bi bi-check-square"></i></span></p>
+</div> -->

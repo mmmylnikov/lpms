@@ -1,0 +1,49 @@
+{% load socialaccount %}
+
+{% block header %}
+<header class="py-1 mb-3 border-bottom bg-body-tertiary">
+    <div class="container-fluid ">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start ">
+            <a href="/"
+                class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none 
+                       col-12 col-lg-auto me-lg-auto col-md-auto me-md-auto col-sm-auto me-sm-auto">
+                <i class="bi bi-keyboard" style="font-size: 2rem; color:grey"></i>
+                <strong class="ms-2" style="color:grey">LPMS</strong>
+                <span class="ms-2 fw-lighter" style="color:grey">| КУРС ПРОГРАММИРОВАНИЯ НА PYTHON</span>
+            </a>
+            <div class="text-end">
+
+                {% if not request.user.is_authenticated %}
+
+                <a class="btn btn-outline-secondary me-2" href="{% provider_login_url 'github' %}">
+                    Войти
+                </a>
+
+                {% else %}
+
+                {% get_social_accounts request.user as accounts %}
+                <div class="flex-shrink-0 dropdown">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{{accounts.github.0.extra_data.avatar_url}}" alt="mdo" width="32" height="32"
+                            class="rounded-circle border">
+                    </a>
+                    <ul class="dropdown-menu text-small shadow">
+                        {% if request.user.is_staff %}
+                        <li><a class="dropdown-item" href="/admin">Админка</a></li>
+                        {% endif %}
+                        <li><a class="dropdown-item" href="{% url 'user_detail_view' request.user.username %}">Мой
+                                профиль</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">Выйти</a></li>
+                    </ul>
+                </div>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+{% endblock %}

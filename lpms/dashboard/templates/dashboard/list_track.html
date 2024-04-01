@@ -1,0 +1,33 @@
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    {% for t in learn_meta.tracks %}
+    <li class="nav-item" role="presentation">
+      <button class="nav-link
+              {% if forloop.counter == 1 %}
+                active
+              {% endif %}
+      
+              " id="pills-{{ forloop.counter }}-tab" 
+              data-bs-toggle="pill" 
+              data-bs-target="#pills-{{ forloop.counter }}" 
+              type="button" role="tab" aria-controls="pills-{{ forloop.counter }}" aria-selected="true">
+        {{ t.name }}
+      </button>
+    </li>
+    {% endfor%}
+</ul>
+
+{% for track in learn_meta.tracks %}
+<div class="tab-content" id="pills-tabContent-{{ forloop.counter }}">
+    <div class="tab-pane fade show pills-{{ forloop.counter }}
+        {% if forloop.counter == 1 %}
+            active
+        {% endif %}
+        " id="pills-{{ forloop.counter }}" role="tabpanel"
+        aria-labelledby="pills-{{ forloop.counter }}-tab" tabindex="0">
+        {% include 'dashboard/list_lesson.html' %}
+        {% include 'dashboard/list_challenge.html' %}
+    </div>
+</div>
+{% endfor%}
+
+

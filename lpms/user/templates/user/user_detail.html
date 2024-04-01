@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load socialaccount %}
+
+{% block head_title %}
+{{ user.get_full_name }}
+{% endblock head_title %}
+
+{% block leftpanel %}
+
+{% get_social_accounts user as accounts %}
+<div class="row">
+    <div class="col">
+        {% include 'user/user_meta.html'%}
+    </div>
+</div>
+
+{% if user == request.user %}
+    {% include 'user/user_update_modal.html'%}
+{% endif %}
+
+{% endblock %}
+
+
+{% block rightpanel %}
+<div class=" row">
+    <div class="col">
+        {% include 'user/list_teams_learn.html' %}
+        {% include 'user/list_teams_review.html' %}
+        {% include 'user/list_task_learn.html' %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% for t, lessons in learn_meta.lessons.items %}
+    {% if t == track %}
+        {% if lessons %}
+        <div class="card mb-3">
+            <div class="card-header">
+              Уроки
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for lesson in lessons %}
+                    <div class="col-sm-12 mb-3 mb-sm-1">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h5 class="card-title">{{ lesson.name }}</h5>
+                                    <div class="btn-group" role="group">
+                                        {% if lesson.video %}
+                                        <button hx-get="{% url 'get_dashboard_content' 'lesson' lesson.pk 'video' %}" 
+                                                hx-target="#modals-lesson-{{lesson.pk}}-video" 
+                                                hx-trigger="click" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modals-lesson-{{lesson.pk}}-video"
+                                                class="btn btn-danger btn-sm"><i class="bi bi-youtube"></i> видео</button>
+                                        {% endif %}
+                                        {% if lesson.slide %}
+                                        <a href="{{lesson.slide}}" target="_blank" class="btn btn-warning btn-sm"><i class="bi bi-file-easel"></i> слайды</a>
+                                        {% endif %}
+                                        {% if lesson.repo %}
+                                        <a href="{{lesson.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
+                                        {% endif %}
+                                        {% if lesson.url %}
+                                        <a href="{{lesson.url}}" target="_blank" class="btn btn-info btn-sm"><i class="bi bi-link"></i> ссылка</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if lesson.content %}
+                                <p class="card-text">{{lesson.content}}</p>
+                                {% endif %}
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div id="modals-lesson-{{lesson.pk}}-video"
+                        class="modal modal-blur fade"
+                        style="display: none"
+                        aria-hidden="false"
+                        tabindex="-1">
+                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                            <div class="modal-content"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+{% endfor %}

@@ -1,0 +1,47 @@
+<div class="card mb-3">
+    <div class="card-header  ">
+        <div class="row">
+            <div class="col">
+                Задание
+                <span class="fw-lighter">| {{ challenge.track.name }} </span>
+                
+            </div>
+            <div class="col text-end"> 
+                <small class="fw-lighter">неделя {{ learn_meta.week_current_number }}/{{ learn_meta.weeks.count }} |</small>
+                <small class="fw-lighter">куратор 
+                    <a href="{% url 'user_detail_view' learn_meta.tutor.username %}">{{ learn_meta.tutor.get_full_name }}</a>
+                </small>
+            </div>
+        </div>
+        
+    </div>
+    <div class="card-body">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h5 class="card-title">{{ challenge.name }}</h5>
+                    <span>
+                        {% if challenge.repo or challenge.url %}
+                        <div class="btn-group" role="group">
+                            {% if challenge.repo %}
+                            <a href="{{challenge.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
+                            {% endif %}
+                            {% if challenge.url %}
+                            
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLessons" aria-expanded="false" aria-controls="collapseLessons">
+                            <i class="bi bi-book"></i> Уроки
+                        </button>
+                    </span>
+                </div>
+                {% if challenge.content %}
+                <p class="card-text">{{challenge.content_markdown|safe}}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+</div>
