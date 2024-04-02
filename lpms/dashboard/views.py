@@ -4,6 +4,7 @@ from typing import Any
 from django.forms import BaseModelForm
 from django.views.generic import TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse
@@ -12,6 +13,7 @@ from course.models import Team
 from learn.models import Lesson, Challenge, Track, Homework
 from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta
+from user.models import Repo, Pull
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -156,3 +158,31 @@ class TaskUpdateView(UpdateView):
 
 class TutorTaskView(TaskViewMixin, TutorDashboardView):
     pass
+
+
+class PullAutocompleteView(TemplateView):
+    template_name = 'dashboard/pull_autocomplete.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if isinstance(self.request.user, AnonymousUser):
+            return context
+        repo_name = self.request.GET.get('repo')
+        if not repo_name:
+            return context
+        repos = Repo.objects.filter(full_name__icontains=repo_name)
+        repos_all = Repo.objects.filter(user=self.request.user)
+        repos_count = repos.count()
+        if repos_count > 1:
+            context.update({'repos': repos})
+        elif repos_count == 1:
+            repo = repos[0]
+            pulls = Pull.objects.filter(repo=repo)
+            if pulls.count() == 0:
+                pulls = repo.update_pulls()
+            context.update({
+                'pulls': pulls
+            })
+        else:
+            context.update({'repos': repos_all})
+        return context

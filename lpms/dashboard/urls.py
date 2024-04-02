@@ -2,7 +2,8 @@ from django.urls import path
 
 from dashboard.views import (StudentDashboardView, TutorDashboardView,
                              ContentView,
-                             StudentTaskView, TutorTaskView, TaskUpdateView)
+                             StudentTaskView, TutorTaskView, TaskUpdateView,
+                             PullAutocompleteView,)
 
 
 urlpatterns = [
@@ -23,4 +24,9 @@ urlpatterns = [
           TutorTaskView.as_view(), name='tutor_task_view'),
      path('task/<int:pk>/update/', TaskUpdateView.as_view(),
           name='task_update_view'),
+
+     # form autocomplete
+     path('autocomplete/pull/',
+          PullAutocompleteView.as_view(),
+          name='pull_autocomplete_view'),
     ]

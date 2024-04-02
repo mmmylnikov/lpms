@@ -1,5 +1,3 @@
-{% load socialaccount %}
-{% get_social_accounts user as accounts %}
 
 <form method="post" id="TaskUpdateForm" action="{% url 'task_update_view' homework.pk %}?status_sending={{status_sending}}&redirect_url={{request.GET.redirect_url}}">
     {% csrf_token %}
@@ -7,10 +5,13 @@
     <div class="mb-3">
         <label for="InputRepo" class="form-label">{{ form.repo.label }}</label>
         {{ form.repo }}
+        <datalist id="repo_options">
+
+        </datalist>
         <div id="repoHelp" class="form-text">
             Вставьте полный путь, например:
             <code>
-                https://github.com/{{accounts.github.0.extra_data.login}}/django_orm_challenges/pull/1
+                https://github.com/{{request.user.github_account.extra_data.login}}/django_orm_challenges/pull/1
             </code>
         </div>
     </div>
