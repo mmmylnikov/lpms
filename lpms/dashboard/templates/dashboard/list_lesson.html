@@ -1,6 +1,11 @@
-{% for t, lessons in learn_meta.lessons.items %}
+{% for t, lessons in learn_meta.week_lessons.items %}
     {% if t == track %}
-        {% if lessons %}
+        {% if not lessons %}
+        <div class="alert alert-primary" role="alert">
+            <i class="bi bi-info-square"></i>
+            По треку нет уроков на этой неделе
+        </div>
+        {% else %}
         <div class="card mb-3">
             <div class="card-header">
               Уроки

@@ -4,8 +4,8 @@ from typing import Any
 from django.forms import BaseModelForm
 from django.views.generic import TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse
 
 from course.models import Team
@@ -21,8 +21,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         team_id = int(str(kwargs['team_slug']).split('_')[1])
-        self.team = Team.objects.get(id=team_id)
+        self.team = Team.objects.select_related(
+            'enrollment', 'tutor').get(id=team_id)
         self.week_number = int(str(kwargs['week_number']))
+        context.update({
+            'team': self.team,
+            'week_number': self.week_number,
+        })
         return context
 
 
@@ -34,7 +39,10 @@ class StudentDashboardView(DashboardView):
         learn_meta = StudentLearnMeta(
             user=self.request.user,
             team=self.team,
-            week_number=self.week_number).get_teams()
+            week_number=self.week_number
+            ).get_teams(
+            ).get_tasks_learn(
+            ).add_task_for_week_challenges()
         context.update({
             'learn_meta': learn_meta,
             'week': learn_meta.week,
