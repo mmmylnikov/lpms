@@ -2,6 +2,15 @@
     <div class="card-header">
         Мои задания
     </div>
+    
+    {% if not learn_meta.week_challenges %}
+    <div class="alert alert-secondary m-0 rounded-0 border-0 fw-light pt-1 pb-1" role="alert">
+        <small>
+            <i class="bi bi-info-square"></i>
+            не удалось загрузить задания
+        </small>
+    </div>
+    {% else %}
     <div class="card-body">
         {% for track, homework in learn_meta.week_challenges.items %}
         <div class="card mb-2">
@@ -37,12 +46,5 @@
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 </div>
-
-<!-- <div>
-    <p>"available" <span class="badge text-bg-secondary"><i class="bi bi-square"></i></span></p>
-    <p>"execution" <span class="badge text-bg-danger"><i class="bi bi-pencil-square"></i></span></p>
-    <p>"review" <span class="badge text-bg-info"><i class="bi bi-r-square"></i></span></p>
-    <p>"correction" <span class="badge text-bg-warning"><i class="bi bi-exclamation-square"></i></span></p>
-    <p>"approved" <span class="badge text-bg-success"><i class="bi bi-check-square"></i></span></p>
-</div> -->

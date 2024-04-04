@@ -29,14 +29,24 @@
                     </a>
                     <ul class="dropdown-menu text-small shadow">
                         {% if request.user.is_staff %}
-                        <li><a class="dropdown-item" href="/admin">Админка</a></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin">
+                                <i class="bi bi-database"></i> Админка
+                            </a>
+                        </li>
                         {% endif %}
-                        <li><a class="dropdown-item" href="{% url 'user_detail_view' request.user.username %}">Мой
-                                профиль</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_detail_view' request.user.username %}">
+                                <i class="bi bi-person-square"></i> Мой профиль
+                            </a>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">Выйти</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'account_logout' %}">
+                                <i class="bi bi-door-closed"></i> Выйти
+                            </a>
+                        </li>
                     </ul>
                 </div>
 

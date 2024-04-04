@@ -102,6 +102,12 @@ class User(AbstractUser):
         else:
             return None
 
+    @property
+    def is_tutor(self) -> bool:
+        if self.groups.filter(pk=GroupEnum.GROUP_TUTOR_ID.value).count() > 0:
+            return True
+        return False
+
     def update_repos(self) -> QuerySet[Repo]:
         repos = GithubApi().get_repos_from_user(self.username)
         for repo in repos:
@@ -112,7 +118,7 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         output = f'{self.last_name} {self.first_name}'
-        if self.groups.filter(pk=GroupEnum.GROUP_TUTOR_ID.value).count() > 0:
+        if self.is_tutor:
             return f'{output} (куратор)'
         return output
 

@@ -11,8 +11,11 @@
         {% include 'course/list_courses.html' %}
         {% include 'course/lpms_about.html' %}
         {% if learn_meta %}
-            {% include 'user/list_teams_learn.html' %}
-            {% include 'user/list_teams_review.html' %}
+            {% if not request.user.is_tutor %}
+                {% include 'user/list_teams_learn.html' %}
+            {% else %}
+                {% include 'user/list_teams_review.html' %}
+            {% endif %}
         {% endif %}
     </div>
 </div>

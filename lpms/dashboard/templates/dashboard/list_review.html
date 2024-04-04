@@ -1,0 +1,42 @@
+<div class="card mb-3">
+    <div class="card-header">
+        Мои ревью
+    </div>
+    
+    {% if not learn_meta.week_reviews %}
+    <div class="alert alert-secondary m-0 rounded-0 border-0 fw-light pt-1 pb-1" role="alert">
+        <small>
+            <i class="bi bi-info-square"></i>
+            нет работ для проверки
+        </small>
+    </div>
+    {% else %}
+    <div class="card-body">
+        {% for student, reviews in learn_meta.week_reviews.items %}
+        <div class="card mb-2 bg-light-subtle">
+            <div class="card-body mb-0 pb-0">
+              <h5 class="card-title fw-light">{{ student.get_full_name }}</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                    {% if not reviews %}
+                    <div class="alert alert-secondary m-0 rounded-0 border-0 fw-light pt-1 pb-1" role="alert">
+                        <small>
+                            <i class="bi bi-info-square"></i>
+                            нет работ для проверки
+                        </small>
+                    </div>
+                    {% else %}
+                        {% for review in reviews %}
+                        <a href="{% url 'tutor_review_view' week_number team.slug review.сhallenge.pk review.user.username %}" 
+                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" aria-current="true">
+                            {{ review.сhallenge.name }}                             
+                            <span class="badge text-bg-{{ review.status_color }}"><i class="{{ review.status_icon }}"></i></span>
+                        </a>
+                        {% endfor %}
+                    {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

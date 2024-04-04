@@ -2,7 +2,7 @@ from django.urls import path
 
 from dashboard.views import (StudentDashboardView, TutorDashboardView,
                              ContentView,
-                             StudentTaskView, TutorTaskView, TaskUpdateView,
+                             StudentTaskView, TutorReviewView, TaskUpdateView,
                              PullAutocompleteView,)
 
 
@@ -20,8 +20,8 @@ urlpatterns = [
           'task/<int:сhallenge_id>/',
           StudentTaskView.as_view(), name='student_task_view'),
      path('review/week/<int:week_number>/team/<slug:team_slug>/'
-          'task/<int:сhallenge_id>/',
-          TutorTaskView.as_view(), name='tutor_task_view'),
+          'task/<int:сhallenge_id>/user/<str:username>/',
+          TutorReviewView.as_view(), name='tutor_review_view'),
      path('task/<int:pk>/update/', TaskUpdateView.as_view(),
           name='task_update_view'),
 

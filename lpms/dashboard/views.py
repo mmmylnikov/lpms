@@ -12,7 +12,7 @@ from django.http import HttpRequest, HttpResponse
 from course.models import Team
 from learn.models import Lesson, Challenge, Track, Homework
 from learn.forms import TaskUpdateForm
-from learn.meta import StudentLearnMeta
+from learn.meta import StudentLearnMeta, TutorLearnMeta
 from learn.enums import HomeworkStatuses
 from user.models import Repo, Pull
 
@@ -48,13 +48,28 @@ class StudentDashboardView(DashboardView):
             ).add_task_for_week_challenges()
         context.update({
             'learn_meta': learn_meta,
-            'week': learn_meta.week,
         })
+        if hasattr(learn_meta, 'week'):
+            context.update({
+                'week': learn_meta.week,
+                })
         return context
 
 
 class TutorDashboardView(DashboardView):
     template_name = "dashboard/tutor.html"
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        learn_meta = TutorLearnMeta(
+            user=self.request.user,
+            team=self.team,
+            week_number=self.week_number
+            ).get_teams()
+        context.update({
+            'learn_meta': learn_meta,
+        })
+        return context
 
 
 class ContentView(TemplateView):
@@ -166,7 +181,7 @@ class TaskUpdateView(UpdateView):
         return response
 
 
-class TutorTaskView(TaskViewMixin, TutorDashboardView):
+class TutorReviewView(TutorDashboardView):
     pass
 
 

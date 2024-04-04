@@ -30,10 +30,12 @@
                                             {% endif %}
                                         </div>
                                         {% endif %}
+                                        {% if not learn_meta.tutor == request.user %}
                                         <a href="{% url 'student_task_view' week_number learn_meta.team.slug challenge.pk %}" class="btn btn-success btn-sm">
                                             <i class="bi bi-laptop"></i>
                                             выполнить
                                         </a>
+                                        {% endif %}
                                     </span>
                                 </div>
                                 
