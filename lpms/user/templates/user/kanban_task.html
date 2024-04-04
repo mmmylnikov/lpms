@@ -1,0 +1,76 @@
+<div class="card mb-3">
+    <div class="card-header">
+        Канбан задач
+    </div>
+    <div class="card-body pb-1 pt-1">
+        <div class="row">
+            <div class="col-3 p-1">
+                <div class="card bg-danger-subtle">
+                    <div class="card-body">
+                        <h5 class="card-title">Выполнение</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for task in learn_meta.tasks_learn %}
+                        {% if task.status == 'execution' %}
+                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action " aria-current="true">
+                            <small>{{ task.сhallenge.name }}</small>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 p-1">
+                <div class="card bg-info-subtle">
+                    <div class="card-body">
+                        <h5 class="card-title">На проверке</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for task in learn_meta.tasks_learn %}
+                        {% if task.status == 'review' %}
+                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                            aria-current="true">
+                            <small>{{ task.сhallenge.name }}</small>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 p-1">
+                <div class="card bg-warning-subtle">
+                    <div class="card-body">
+                        <h5 class="card-title">На правку</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for task in learn_meta.tasks_learn %}
+                        {% if task.status == 'correction' %}
+                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                            aria-current="true">
+                            <small>{{ task.сhallenge.name }}</small>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 p-1">
+                <div class="card bg-success-subtle">
+                    <div class="card-body">
+                        <h5 class="card-title">Принято</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for task in learn_meta.tasks_learn %}
+                        {% if task.status == 'approved' %}
+                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                            aria-current="true">
+                            <small>{{ task.сhallenge.name }}</small>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
