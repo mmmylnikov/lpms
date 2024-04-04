@@ -12,3 +12,16 @@ repos:
     hooks:
     - id: mypy
       name: mypy
+      additional_dependencies: [
+        Django==5.0.3,
+        django-allauth==0.61.1,
+        django-debug-toolbar==4.3.0,
+        django-import-export==3.3.7,
+        django-stubs==4.2.7,
+        django-stubs-ext==4.2.7,
+        Markdown==3.6,
+        mypy-extensions==1.0.0,
+        types-Markdown==3.6.0.20240316,
+        python-dotenv==1.0.1,
+        PyGithub==2.3.0,
+        ]
