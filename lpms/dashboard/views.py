@@ -13,6 +13,7 @@ from course.models import Team
 from learn.models import Lesson, Challenge, Track, Homework
 from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta
+from learn.enums import HomeworkStatuses
 from user.models import Repo, Pull
 
 
@@ -138,6 +139,15 @@ class TaskUpdateView(UpdateView):
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['status_sending'] = self.request.GET.get('status_sending')
+        form = context['form']
+        repo_isreadonly = form.instance.status not in [
+            HomeworkStatuses.available.name,
+            HomeworkStatuses.execution.name,]
+        if self.request.method == 'GET' and repo_isreadonly:
+            form.fields['repo'].widget.attrs.update({
+                'readonly': True,
+                'title': 'Вы не пожете редактировать '
+                         'ссылку после отправки'})
         return context
 
     def post(self,
@@ -181,7 +191,8 @@ class PullAutocompleteView(TemplateView):
             if pulls.count() == 0:
                 pulls = repo.update_pulls()
             context.update({
-                'pulls': pulls
+                'pulls': pulls,
+                'repos': repos
             })
         else:
             context.update({'repos': repos_all})
