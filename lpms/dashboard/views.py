@@ -194,12 +194,20 @@ class PullAutocompleteView(TemplateView):
             return context
         repo_name = self.request.GET.get('repo')
         if not repo_name:
-            return context
-        repos = Repo.objects.filter(full_name__icontains=repo_name)
+            repos = Repo.objects.all()
+            pulls = Pull.objects.all().select_related('repo')
+        else:
+            repos = Repo.objects.filter(full_name__icontains=repo_name)
+            pulls = Pull.objects.filter(
+                html_url__icontains=repo_name).select_related('repo')
         repos_all = Repo.objects.filter(user=self.request.user)
+        pulls_all = Pull.objects.filter(repo__user=self.request.user)
         repos_count = repos.count()
         if repos_count > 1:
-            context.update({'repos': repos})
+            context.update({
+                'repos': repos,
+                'pulls': pulls,
+                })
         elif repos_count == 1:
             repo = repos[0]
             pulls = Pull.objects.filter(repo=repo)
@@ -207,8 +215,11 @@ class PullAutocompleteView(TemplateView):
                 pulls = repo.update_pulls()
             context.update({
                 'pulls': pulls,
-                'repos': repos
+                'repos': repos,
             })
         else:
-            context.update({'repos': repos_all})
+            context.update({
+                'repos': repos_all,
+                'pulls': pulls_all,
+                })
         return context

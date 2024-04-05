@@ -28,7 +28,7 @@
             <button type="submit" class="btn btn-danger btn-sm" name='status_sending' value="available" formnovalidate="TaskUpdateForm">Отменить выполнение</button>
             {% endif %}
             
-            <button type="" class="btn btn-success btn-sm" name='status_sending' value="{{status_sending}}" >
+            <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="{{status_sending}}" >
                 {% if object.status == 'execution' or object.status == 'available' or object.status == 'correction' %}
                 Отправить на проверку
                 {% else %}
