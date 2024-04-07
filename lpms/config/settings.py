@@ -1,3 +1,4 @@
+import json
 from os import getenv
 from pathlib import Path
 
@@ -7,12 +8,14 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-%s_nk%-p#mtt@#c&0h(x1$++0p(hkft%w&a_*pdcqt4r#^l1r-'
+SHARED_ROOT = BASE_DIR / 'shared'
+
+SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 
 DEBUG = getenv("DEBUG", 'False').lower() in ('true', '1')
 
 
-ALLOWED_HOSTS = getenv('ALLOWED_HOSTS').split(',')  # type: ignore
+ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     # LPMS
@@ -74,10 +77,19 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.'
+                  f'{getenv("DATABASE_ENGINE", "sqlite3")}',
+        'NAME': getenv('DATABASE_NAME', 'lmpsdbdebug'),
+        'USER': getenv('DATABASE_USERNAME', 'lpmsuserdebug'),
+        'PASSWORD': getenv('DATABASE_PASSWORD', 'lpmspassdebug'),
+        'HOST': getenv('DATABASE_HOST', '127.0.0.1'),
+        'PORT': getenv('DATABASE_PORT', 5432),
+        'OPTIONS': json.loads(getenv('DATABASE_OPTIONS', '{}')),
     }
 }
+
+if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+    DATABASES['default']['NAME'] = SHARED_ROOT / 'db.sqlite3'
 
 AUTH_USER_MODEL = "user.User"
 
@@ -105,6 +117,13 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = SHARED_ROOT / 'static'
+
+STATICFILES_DIRS = [
+    # SHARED_ROOT / "static",
+    # "/var/www/static/",
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
