@@ -1,19 +1,25 @@
-{% for t, challenges in learn_meta.challenges.items %}
+{% for t, homework in learn_meta.week_challenges.items %}
     {% if t == track %}
-        {% if challenges %}
+        {% if not homework %}
+        <div class="alert alert-secondary" role="alert">
+            <i class="bi bi-info-square"></i>
+            По треку нет задач на этой неделе
+        </div>
+        {% else %}
         <div class="card">
             <div class="card-header">
               Задания
             </div>
             <div class="card-body">
                 <div class="row">
-                    {% for challenge in challenges %}
+                    {% for challenge, task in homework %}
                     <div class="col-sm-12 mb-3 mb-sm-1">
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <h5 class="card-title">{{ challenge.name }}</h5>
                                     <span>
+                                        
                                         {% if challenge.repo or challenge.url %}
                                         <div class="btn-group" role="group">
                                             {% if challenge.repo %}
@@ -24,18 +30,22 @@
                                             {% endif %}
                                         </div>
                                         {% endif %}
-                                        <a href="{% url 'student_task_view' week.number learn_meta.team.slug challenge.pk %}" class="btn btn-success btn-sm">
+                                        {% if not learn_meta.tutor == request.user %}
+                                        <a href="{% url 'student_task_view' week_number learn_meta.team.slug challenge.pk %}" class="btn btn-success btn-sm">
                                             <i class="bi bi-laptop"></i>
                                             выполнить
                                         </a>
+                                        {% endif %}
                                     </span>
                                 </div>
+                                
                                 {% if challenge.content %}
                                 <p class="card-text">{{challenge.content_markdown|safe}}</p>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
+                    
                     {% endfor %}
                 </div>
             </div>

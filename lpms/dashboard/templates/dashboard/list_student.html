@@ -1,0 +1,15 @@
+<div class="card mb-3">
+    <div class="card-header">
+        Студенты
+    </div>
+    <div class="list-group list-group-flush">
+        {% for student, github_account in learn_meta.students.items %}
+            <a href="{% url 'user_detail_view' student.username %}" class="list-group-item list-group-item-action">
+                <img src="{{ github_account.extra_data.avatar_url}}" alt="mdo" width="32" height="32"
+                            class="rounded border">
+                {{student.get_full_name}}
+                <small class="fw-lighter"> | {{student.username}}</small>
+            </a>
+        {% endfor %}
+      </div>
+</div>

@@ -4,14 +4,17 @@ from typing import Any
 from django.forms import BaseModelForm
 from django.views.generic import TemplateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse
 
 from course.models import Team
 from learn.models import Lesson, Challenge, Track, Homework
 from learn.forms import TaskUpdateForm
-from learn.meta import StudentLearnMeta
+from learn.meta import StudentLearnMeta, TutorLearnMeta
+from learn.enums import HomeworkStatuses
+from user.models import Repo, Pull
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -21,8 +24,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
         team_id = int(str(kwargs['team_slug']).split('_')[1])
-        self.team = Team.objects.get(id=team_id)
+        self.team = Team.objects.select_related(
+            'enrollment', 'tutor').get(id=team_id)
         self.week_number = int(str(kwargs['week_number']))
+        context.update({
+            'team': self.team,
+            'week_number': self.week_number,
+        })
         return context
 
 
@@ -34,16 +42,34 @@ class StudentDashboardView(DashboardView):
         learn_meta = StudentLearnMeta(
             user=self.request.user,
             team=self.team,
-            week_number=self.week_number).get_teams()
+            week_number=self.week_number
+            ).get_teams(
+            ).get_tasks_learn(
+            ).add_task_for_week_challenges()
         context.update({
             'learn_meta': learn_meta,
-            'week': learn_meta.week,
         })
+        if hasattr(learn_meta, 'week'):
+            context.update({
+                'week': learn_meta.week,
+                })
         return context
 
 
 class TutorDashboardView(DashboardView):
     template_name = "dashboard/tutor.html"
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        learn_meta = TutorLearnMeta(
+            user=self.request.user,
+            team=self.team,
+            week_number=self.week_number
+            ).get_teams()
+        context.update({
+            'learn_meta': learn_meta,
+        })
+        return context
 
 
 class ContentView(TemplateView):
@@ -128,6 +154,15 @@ class TaskUpdateView(UpdateView):
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['status_sending'] = self.request.GET.get('status_sending')
+        form = context['form']
+        repo_isreadonly = form.instance.status not in [
+            HomeworkStatuses.available.name,
+            HomeworkStatuses.execution.name,]
+        if self.request.method == 'GET' and repo_isreadonly:
+            form.fields['repo'].widget.attrs.update({
+                'readonly': True,
+                'title': 'Вы не пожете редактировать '
+                         'ссылку после отправки'})
         return context
 
     def post(self,
@@ -146,5 +181,45 @@ class TaskUpdateView(UpdateView):
         return response
 
 
-class TutorTaskView(TaskViewMixin, TutorDashboardView):
+class TutorReviewView(TutorDashboardView):
     pass
+
+
+class PullAutocompleteView(TemplateView):
+    template_name = 'dashboard/pull_autocomplete.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        if isinstance(self.request.user, AnonymousUser):
+            return context
+        repo_name = self.request.GET.get('repo')
+        if not repo_name:
+            repos = Repo.objects.all()
+            pulls = Pull.objects.all().select_related('repo')
+        else:
+            repos = Repo.objects.filter(full_name__icontains=repo_name)
+            pulls = Pull.objects.filter(
+                html_url__icontains=repo_name).select_related('repo')
+        repos_all = Repo.objects.filter(user=self.request.user)
+        pulls_all = Pull.objects.filter(repo__user=self.request.user)
+        repos_count = repos.count()
+        if repos_count > 1:
+            context.update({
+                'repos': repos,
+                'pulls': pulls,
+                })
+        elif repos_count == 1:
+            repo = repos[0]
+            pulls = Pull.objects.filter(repo=repo)
+            if pulls.count() == 0:
+                pulls = repo.update_pulls()
+            context.update({
+                'pulls': pulls,
+                'repos': repos,
+            })
+        else:
+            context.update({
+                'repos': repos_all,
+                'pulls': pulls_all,
+                })
+        return context

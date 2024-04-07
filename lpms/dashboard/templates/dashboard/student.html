@@ -1,6 +1,7 @@
 {% extends "dashboard_panels.html" %}
 
 {% block head_title %}
+{{ team.enrollment.slug }} | неделя {{week_number}}
 {% endblock head_title %}
 
 {% block leftpanel %}
@@ -8,7 +9,6 @@
 <div class="row">
     <div class="col">
         {% include 'user/list_teams_learn.html' %}
-        {% include 'user/list_teams_review.html' %}
         {% include 'dashboard/list_task.html' %}
     </div>
 </div>

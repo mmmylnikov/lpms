@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group as BaseGroup
 from import_export.admin import ImportExportModelAdmin
 
-from user.models import User, Group
+from user.models import User, Group, Repo, Pull
 
 
 class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
@@ -27,6 +27,18 @@ class GroupAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     pass
 
 
+class RepoAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('user', 'full_name', )
+    list_display_links = ('full_name', )
+
+
+class PullAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('repo', 'number', 'title', )
+    list_display_links = ('title', )
+
+
 admin.site.unregister(BaseGroup)
 admin.site.register(User, UserAdmin)
 admin.site.register(Group, GroupAdmin)
+admin.site.register(Repo, RepoAdmin)
+admin.site.register(Pull, PullAdmin)

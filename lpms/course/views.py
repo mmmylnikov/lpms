@@ -7,7 +7,6 @@ from learn.meta import LearnMeta
 
 class CourseDetailView(TemplateView):
     template_name = 'course/course_detail.html'
-    # model = Course
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)

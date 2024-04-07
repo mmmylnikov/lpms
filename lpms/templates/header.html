@@ -21,23 +21,32 @@
 
                 {% else %}
 
-                {% get_social_accounts request.user as accounts %}
                 <div class="flex-shrink-0 dropdown">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{accounts.github.0.extra_data.avatar_url}}" alt="mdo" width="32" height="32"
+                        <img src="{{ learn_meta.user_github.extra_data.avatar_url}}" alt="mdo" width="32" height="32"
                             class="rounded-circle border">
                     </a>
                     <ul class="dropdown-menu text-small shadow">
                         {% if request.user.is_staff %}
-                        <li><a class="dropdown-item" href="/admin">Админка</a></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin">
+                                <i class="bi bi-database"></i> Админка
+                            </a>
+                        </li>
                         {% endif %}
-                        <li><a class="dropdown-item" href="{% url 'user_detail_view' request.user.username %}">Мой
-                                профиль</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_detail_view' request.user.username %}">
+                                <i class="bi bi-person-square"></i> Мой профиль
+                            </a>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="{% url 'account_logout' %}">Выйти</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'account_logout' %}">
+                                <i class="bi bi-door-closed"></i> Выйти
+                            </a>
+                        </li>
                     </ul>
                 </div>
 

@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Self
 
+from allauth.socialaccount.models import SocialAccount
 from django.db.models import QuerySet
 from django.contrib.auth.models import AnonymousUser
 
@@ -12,25 +13,31 @@ from learn.enums import HomeworkStatuses
 
 class LearnMeta:
     user: User | AnonymousUser
+    user_github: SocialAccount
     teams_learn: QuerySet[Team] | None
     teams_review: QuerySet[Team] | None
     tasks_learn: QuerySet[Homework] | None
 
     def __init__(self, user: User | AnonymousUser) -> None:
         self.user = user
+        self.get_user_github_account()
 
     def get_teams_learn(self) -> QuerySet[Team] | None:
         """ Return teams where the user is a student """
         if isinstance(self.user, AnonymousUser):
             return None
-        self.teams_learn = self.user.team_set.all()
+        self.teams_learn = self.user.team_set.all().select_related(
+            'tutor', 'enrollment', 'enrollment__course')
         return self.teams_learn
 
     def get_teams_review(self) -> QuerySet[Team] | None:
         """ Return teams where the user is a tutor """
         if isinstance(self.user, AnonymousUser):
             return None
-        self.teams_review = Team.objects.filter(tutor=self.user)
+        self.teams_review = Team.objects.filter(
+            tutor=self.user).select_related(
+            'tutor', 'enrollment', 'enrollment__course'
+            ).prefetch_related('students')
         return self.teams_review
 
     def get_teams(self) -> Self:
@@ -38,13 +45,29 @@ class LearnMeta:
         self.get_teams_review()
         return self
 
-    def get_tasks_learn(self) -> Self:
+    def get_tasks_learn(self, only_at_work: bool = True) -> Self:
         if isinstance(self.user, AnonymousUser):
             return self
-        self.tasks_learn = Homework.objects.filter(
-            user=self.user).exclude(status__in=[
+        tasks_learn = Homework.objects.filter(user=self.user)
+        if not only_at_work:
+            tasks_learn = tasks_learn.exclude(status__in=[
                 HomeworkStatuses.approved.name,
                 HomeworkStatuses.available.name])
+        self.tasks_learn = tasks_learn.select_related(
+                    'сhallenge', 'сhallenge__track', 'week',
+                    'team', 'team__enrollment', 'team__enrollment__course')
+        return self
+
+    def get_user_github_account(self) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        accounts = {}  # type: ignore
+        for account in self.user.socialaccount_set.all(  # type: ignore
+                ).iterator():
+            providers = accounts.setdefault(account.provider, [])
+            providers.append(account)
+        if accounts.get('github'):
+            self.user_github = accounts['github'][0]
         return self
 
 
@@ -63,8 +86,9 @@ class StudentLearnMeta(LearnMeta):
     week: Week
     week_number: int
     week_tracks: QuerySet[Track]
-    lessons = dict[Track, QuerySet[Lesson]]
-    challenges = dict[Track, QuerySet[Challenge]]
+    week_lessons: dict[Track, list[Lesson]]
+    week_challenges: dict[Track, list[tuple[Challenge, Homework | None]]
+                          ] | None = None
 
     def __init__(self,
                  user: User | AnonymousUser,
@@ -85,7 +109,7 @@ class StudentLearnMeta(LearnMeta):
         self.week_number = week_number
 
         self.program = Program.objects.filter(
-            enrollments__in=[self.enrollment]).last()
+            enrollments__in=[self.enrollment]).prefetch_related('weeks').last()
         if not self.program:
             return
 
@@ -112,25 +136,82 @@ class StudentLearnMeta(LearnMeta):
             self.week = self.weeks.get(number=self.week_number)
 
     def get_lessons_from_week(self) -> None:
-        self.lessons = {track: self.week.lessons.filter(
-            track=track) for track in self.tracks}        # type: ignore
-        """
-        for "type: ignore": I don't know how to resolve it:
-        --------------------------------------------------------------
-        mypy: learn/meta.py:104: error: Incompatible types in assignment
-        (expression has type "dict[Track, _QuerySet[Lesson, Lesson]]",
-        variable has type "type[dict[Any, Any]]")  [assignment]
-        --------------------------------------------------------------
-        """
+        lessons = list(self.week.lessons.all().select_related('track'))
+        self.week_lessons = {track: [
+            lesson for lesson in lessons if lesson.track == track
+            ] for track in self.tracks}  # type: ignore
 
     def get_challenges_from_week(self) -> None:
-        self.challenges = {track: self.week.challenges.filter(
-            track=track) for track in self.tracks}              # type: ignore
-        """
-        for "type: ignore": I don't know how to resolve it:
-        --------------------------------------------------------------------
-        mypy: learn/meta.py:116: error: Incompatible types in assignment
-        (expression has type "dict[Track, _QuerySet[Challenge, Challenge]]",
-        variable has type "type[dict[Any, Any]]")  [assignment]
-        --------------------------------------------------------------------
-        """
+        challenges = list(self.week.challenges.all().select_related('track'))
+        week_challenges = dict()
+        if not self.tracks:
+            self.week_challenges = None
+            return None
+        for track in self.tracks:
+            week_homework = []
+            for challenge in challenges:
+                if challenge.track != track:
+                    continue
+                week_homework.append((challenge, None))
+            week_challenges.update({
+                track: week_homework,
+            })
+        self.week_challenges = week_challenges  # type: ignore
+
+    def add_task_for_week_challenges(self) -> Self:
+        if self.user == self.tutor:
+            return self
+        if not self.tasks_learn:
+            return self
+        tasks = list(self.tasks_learn)
+        week_challenges = {}
+        if not self.week_challenges:
+            return self
+        for track, homework in self.week_challenges.items():
+            week_homework = []
+            for challenge, _ in homework:  # type: ignore
+                task = None
+                week_tasks = [
+                    task for task in tasks if task.сhallenge == challenge]
+                if week_tasks:
+                    task = week_tasks[0]
+                week_homework.append((challenge, task))
+            week_challenges.update({
+                track: week_homework,
+            })
+        self.week_challenges = week_challenges  # type: ignore
+        return self
+
+
+class TutorLearnMeta(StudentLearnMeta):
+    # review
+    students: dict[User, SocialAccount]
+    week_reviews: dict[User, list[Homework | None]] | None = None
+
+    def __init__(self,
+                 user: User | AnonymousUser,
+                 team: Team, week_number: int) -> None:
+        super().__init__(user, team, week_number)
+        self.get_students()
+        self.get_week_reviews()
+
+    def get_students(self) -> None:
+        accounts = SocialAccount.objects.filter(
+            user__in=list(self.team.students.all())).select_related('user')
+        self.students = {account.user: account for account in accounts}
+
+    def get_week_reviews(self) -> None:
+        reviews = Homework.objects.filter(
+            week=self.week, team=self.team,
+            status__in=[
+                HomeworkStatuses.approved.name,
+                HomeworkStatuses.review.name,
+                HomeworkStatuses.correction.name,
+                ]
+            ).select_related('user', 'сhallenge')
+        week_reviews: dict[User, list[Homework | None]] = dict()
+        for review in reviews:
+            if not week_reviews.get(review.user):
+                week_reviews[review.user] = []
+            week_reviews[review.user].append(review)
+        self.week_reviews = week_reviews

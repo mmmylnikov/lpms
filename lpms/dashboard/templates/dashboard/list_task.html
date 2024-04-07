@@ -2,45 +2,49 @@
     <div class="card-header">
         Мои задания
     </div>
+    
+    {% if not learn_meta.week_challenges %}
+    <div class="alert alert-secondary m-0 rounded-0 border-0 fw-light pt-1 pb-1" role="alert">
+        <small>
+            <i class="bi bi-info-square"></i>
+            не удалось загрузить задания
+        </small>
+    </div>
+    {% else %}
     <div class="card-body">
-        {% for track in learn_meta.tracks %}
+        {% for track, homework in learn_meta.week_challenges.items %}
         <div class="card mb-2">
-            <div class="card-body mb-0 pb-0
-                        ">
+            <div class="card-body mb-0 pb-0">
               <h5 class="card-title ">{{ track.name }}</h5>
             </div>
             <div class="list-group list-group-flush">
-                {% for t, challenges in learn_meta.challenges.items %}
-                {% if t == track %}
-                    {% if challenges %}
-                        {% for c in challenges %}
-                        <a href="{% url 'student_task_view' week.number learn_meta.team.slug c.pk %}" 
+                    {% if not homework %}
+                    <div class="alert alert-secondary m-0 rounded-0 border-0 fw-light pt-1 pb-1" role="alert">
+                        <small>
+                            <i class="bi bi-info-square"></i>
+                            на этой неделе нет задач
+                        </small>
+                    </div>
+                    {% else %}
+                        {% for week_challenge, week_task in homework %}
+                        <a href="{% url 'student_task_view' week_number team.slug week_challenge.pk %}" 
                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-start
-                                 {% if c == challenge %}
+                                 {% if week_challenge == challenge %}
                                  active
                                  {% endif %}
                                  " aria-current="true">
-                            {{ c.name }} 
-                            {% if c.homework_set.all.count == 0 %}
+                            {{ week_challenge.name }} 
+                            {% if not week_task %}
                             <span class="badge text-bg-secondary"><i class="bi bi-square"></i></span>
                             {% else %}
-                            <span class="badge text-bg-{{c.homework_set.first.status_color}}"><i class="{{c.homework_set.first.status_icon}}"></i></span>
+                            <span class="badge text-bg-{{ week_task.status_color }}"><i class="{{ week_task.status_icon }}"></i></span>
                             {% endif %}
                           </a>
                         {% endfor %}
                     {% endif %}
-                {% endif %}
-                {% endfor %}
             </div>
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 </div>
-
-<!-- <div>
-    <p>"available" <span class="badge text-bg-secondary"><i class="bi bi-square"></i></span></p>
-    <p>"execution" <span class="badge text-bg-danger"><i class="bi bi-pencil-square"></i></span></p>
-    <p>"review" <span class="badge text-bg-info"><i class="bi bi-r-square"></i></span></p>
-    <p>"correction" <span class="badge text-bg-warning"><i class="bi bi-exclamation-square"></i></span></p>
-    <p>"approved" <span class="badge text-bg-success"><i class="bi bi-check-square"></i></span></p>
-</div> -->

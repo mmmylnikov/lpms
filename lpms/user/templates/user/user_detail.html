@@ -25,9 +25,13 @@
 {% block rightpanel %}
 <div class=" row">
     <div class="col">
-        {% include 'user/list_teams_learn.html' %}
-        {% include 'user/list_teams_review.html' %}
-        {% include 'user/list_task_learn.html' %}
+        {% if user.is_tutor %}
+            {% include 'user/list_teams_review.html' %}
+        {% else %}
+            {% include 'user/list_teams_learn.html' %}
+            {% include 'user/list_task_learn.html' %}
+            {% include 'user/kanban_task.html' %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}
