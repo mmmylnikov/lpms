@@ -89,6 +89,15 @@ class User(AbstractUser):
         related_name="user_set",
         related_query_name="user",
     )
+    notify = models.BooleanField(
+        default=False,
+        verbose_name='Присылать уведомления')
+
+    @property
+    def notify_icon(self) -> str:
+        if self.notify:
+            return 'bi bi-bell-fill'
+        return 'bi bi-bell-slash-fill'
 
     @property
     def github_account(self) -> SocialAccount | None:
@@ -107,6 +116,11 @@ class User(AbstractUser):
         if self.groups.filter(pk=GroupEnum.GROUP_TUTOR_ID.value).count() > 0:
             return True
         return False
+
+    def switch_notify(self) -> bool:
+        self.notify = not self.notify
+        self.save()
+        return self.notify
 
     def update_repos(self) -> QuerySet[Repo]:
         repos = GithubApi().get_repos_from_user(self.username)

@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'course.apps.CourseConfig',
     'learn.apps.LearnConfig',
     'dashboard.apps.DashboardConfig',
+    'notify.apps.NotifyConfig',
     # Django
     'django.contrib.admin',
     'django.contrib.auth',
@@ -120,11 +121,6 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = SHARED_ROOT / 'static'
 
-STATICFILES_DIRS = [
-    # SHARED_ROOT / "static",
-    # "/var/www/static/",
-]
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = [
@@ -159,3 +155,5 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
 GITHUB_API_TOKEN = getenv('GITHUB_API_TOKEN')
+
+TELEGRAM_BOT_TOKEN = getenv('TELEGRAM_BOT_TOKEN')

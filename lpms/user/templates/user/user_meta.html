@@ -17,11 +17,17 @@
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span class="bi bi-telegram"> Telegram</span>
-                <span class="badge text-bg-light rounded-pill">
-                    <a href="https://t.me/{{user.tg_username}}" target="_blank">
-                        {{user.tg_username}}
-                    </a>
+                <span>
+                    {% if user == request.user %}
+                    <i class="{{user.notify_icon}}"></i>
+                    {% endif %}
+                    <span class="badge text-bg-light rounded-pill">
+                        <a href="https://t.me/{{user.tg_username}}" target="_blank">
+                            {{user.tg_username}}
+                        </a>
+                    </span>
                 </span>
+                
             </li>
         </ul>
         <div class="d-flex justify-content-between align-items-center pt-2">
@@ -29,7 +35,16 @@
                 {% if user == request.user %}
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                     data-bs-target="#modalUserUpdate">
-                    Редактировать
+                    Редактировать профиль
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                    data-bs-target="#modalUserNotify">
+                    {% if not user.notify %}
+                    Включить 
+                    {% else %}
+                    Выключить
+                    {% endif %}
+                    уведомления
                 </button>
                 {% endif %}
             </div>
