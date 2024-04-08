@@ -6,6 +6,19 @@ from notify.enums import Providers, MessageTemplates, MessageStatuses
 from notify.providers import TelegramBot
 
 
+def save_message(user: User, account: Account, text: str,
+                 status: str, status_comment: str) -> Message:
+    message = Message(
+        user=user,
+        account=account,
+        text=text,
+        status=status,
+        status_comment=status_comment,
+    )
+    message.save()
+    return message
+
+
 def get_notify_status(user: User) -> str:
     accounts = Account.objects.filter(user=user)
     template = loader.get_template('notify/notify_help.html')
@@ -45,18 +58,44 @@ def switch_notify(user: User) -> bool:
     else:
         message_status = MessageStatuses.ERROR
 
-    message = Message(
+    message_comment = message_text.name
+    if not bot_response['ok']:
+        bot_response_comment = bot_response['description']
+        message_comment += str(bot_response_comment)
+
+    save_message(
         user=user,
         account=account,
         text=message_text.value,
         status=message_status.value,
-        status_comment=message_text.name,
+        status_comment=message_comment,
     )
+    return True
+
+
+def send_message_homework_status_update(user: User, message: str) -> None:
+    if not user.notify or not user.tg_username:
+        return None
+
+    account = Account.objects.get(user=user)
+
+    bot = TelegramBot()
+    bot_response = bot.send_message(account.chat_uid, message)
+    if bot_response['ok']:
+        message_status = MessageStatuses.OK
+    else:
+        message_status = MessageStatuses.ERROR
+
+    message_comment = MessageTemplates.TASK_STATUS_UPDATE.name
     if not bot_response['ok']:
         bot_response_comment = bot_response['description']
-        if not message.status_comment:
-            message.status_comment = bot_response_comment
-        else:
-            message.status_comment += f"; {bot_response_comment}"
-    message.save()
-    return True
+        message_comment += str(bot_response_comment)
+    pass
+
+    save_message(
+        user=user,
+        account=account,
+        text=message,
+        status=message_status.value,
+        status_comment=message_comment,
+    )

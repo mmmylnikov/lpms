@@ -1,7 +1,8 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
-from learn.models import Lesson, Challenge, Homework, Week, Program
+from learn.models import (Lesson, Challenge, Week, Program,
+                          Homework, HomeworkStatus)
 
 
 class AddedFieldAdminMixin:
@@ -41,6 +42,13 @@ class HomeworkAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     ordering = ('сhallenge', 'user')
 
 
+class HomeworkStatusAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+    list_display = ('updated_at', 'student', 'tutor', 'status', 'homework', )
+    list_display_links = ('homework',)
+    list_filter = ('homework__сhallenge__track', )
+    ordering = ('updated_at', )
+
+
 class WeekAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
                 admin.ModelAdmin):
     list_display = ('course', 'number', 'added')
@@ -62,5 +70,7 @@ class ProgramAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Challenge, ChallengeAdmin)
 admin.site.register(Homework, HomeworkAdmin)
+admin.site.register(HomeworkStatus, HomeworkStatusAdmin)
+
 admin.site.register(Week, WeekAdmin)
 admin.site.register(Program, ProgramAdmin)

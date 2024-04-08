@@ -26,7 +26,7 @@
                         </small>
                     </div>
                     {% else %}
-                        {% for week_challenge, week_task in homework %}
+                        {% for week_challenge, week_task, week_task_status in homework %}
                         <a href="{% url 'student_task_view' week_number team.slug week_challenge.pk %}" 
                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-start
                                  {% if week_challenge == challenge %}
@@ -37,7 +37,9 @@
                             {% if not week_task %}
                             <span class="badge text-bg-secondary"><i class="bi bi-square"></i></span>
                             {% else %}
-                            <span class="badge text-bg-{{ week_task.status_color }}"><i class="{{ week_task.status_icon }}"></i></span>
+                            <span class="badge text-bg-{{ week_task_status.status_color }}">
+                                <i class="{{ week_task_status.status_icon }}"></i>
+                            </span>
                             {% endif %}
                           </a>
                         {% endfor %}

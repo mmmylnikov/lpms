@@ -10,10 +10,11 @@
                         <h5 class="card-title">Выполнение</h5>
                     </div>
                     <div class="list-group list-group-flush">
-                        {% for task in learn_meta.tasks_learn %}
-                        {% if task.status == 'execution' %}
-                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action " aria-current="true">
-                            <small>{{ task.сhallenge.name }}</small>
+                        {% for status in learn_meta.get_tasks_status_latest %}
+                        {% if status.status == 'execution' %}
+                        <a href="{{status.homework.get_student_absolute_url}}" 
+                           class="list-group-item list-group-item-action " aria-current="true">
+                            <small>{{ status.homework.сhallenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}
@@ -26,11 +27,11 @@
                         <h5 class="card-title">На проверке</h5>
                     </div>
                     <div class="list-group list-group-flush">
-                        {% for task in learn_meta.tasks_learn %}
-                        {% if task.status == 'review' %}
-                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                        {% for status in learn_meta.get_tasks_status_latest %}
+                        {% if status.status == 'review' %}
+                        <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
                             aria-current="true">
-                            <small>{{ task.сhallenge.name }}</small>
+                            <small>{{ status.homework.сhallenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}
@@ -43,11 +44,11 @@
                         <h5 class="card-title">На правку</h5>
                     </div>
                     <div class="list-group list-group-flush">
-                        {% for task in learn_meta.tasks_learn %}
-                        {% if task.status == 'correction' %}
-                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                        {% for status in learn_meta.get_tasks_status_latest %}
+                        {% if status.status == 'correction' %}
+                        <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
                             aria-current="true">
-                            <small>{{ task.сhallenge.name }}</small>
+                            <small>{{ status.homework.сhallenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}
@@ -60,11 +61,11 @@
                         <h5 class="card-title">Принято</h5>
                     </div>
                     <div class="list-group list-group-flush">
-                        {% for task in learn_meta.tasks_learn %}
-                        {% if task.status == 'approved' %}
-                        <a href="{{task.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                        {% for status in learn_meta.get_tasks_status_latest %}
+                        {% if status.status == 'approved' %}
+                        <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
                             aria-current="true">
-                            <small>{{ task.сhallenge.name }}</small>
+                            <small>{{ status.homework.сhallenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}

@@ -9,8 +9,9 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse
 
+
 from course.models import Team
-from learn.models import Lesson, Challenge, Track, Homework
+from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta
 from learn.enums import HomeworkStatuses
@@ -72,7 +73,7 @@ class TutorDashboardView(DashboardView):
         return context
 
 
-class ContentView(TemplateView):
+class ContentView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/content.html"
 
     class SectionMapper(Enum):
@@ -101,7 +102,7 @@ class ContentView(TemplateView):
         return context
 
 
-class TaskViewMixin(TemplateView):
+class TaskViewMixin(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/task.html"
     challenge: Challenge
     track: Track
@@ -121,6 +122,8 @@ class TaskViewMixin(TemplateView):
 class StudentTaskView(TaskViewMixin, StudentDashboardView):
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
+        if isinstance(self.request.user, AnonymousUser):
+            return context
         task, created = Homework.objects.get_or_create(
             user=self.request.user,
             сhallenge=context['challenge'],
@@ -128,24 +131,45 @@ class StudentTaskView(TaskViewMixin, StudentDashboardView):
             team=self.team,
         )
         if created:
-            task.status = 'execution'
+            status = HomeworkStatus(
+                student=self.request.user,
+                tutor=self.team.tutor,
+                homework=task,
+                status=HomeworkStatuses.execution.name,
+            )
+            status.save()
             task.save()
+        else:
+            if not task:
+                status = None
+            else:
+                status = HomeworkStatus.objects.filter(
+                    homework=task, student=self.request.user).last()
         context.update({
             'task': task,
+            'status': status,
             'status_sending': 'review',
         })
         return context
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Homework
     form_class = TaskUpdateForm
     template_name = 'dashboard/task_update_form.html'
 
     def set_obj_status(self, status: str | None) -> Homework:
-        obj = self.get_object()
-        obj.status = status
-        obj.save()
+        obj: Homework = self.get_object()
+        if isinstance(self.request.user, AnonymousUser):
+            return obj
+        if not status:
+            return obj
+        HomeworkStatus(
+            student=self.request.user,
+            tutor=obj.team.tutor,
+            status=status,
+            homework=obj,
+        ).save()
         return obj
 
     def get_success_url(self) -> str:
@@ -153,16 +177,20 @@ class TaskUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context['status_sending'] = self.request.GET.get('status_sending')
         form = context['form']
-        repo_isreadonly = form.instance.status not in [
+        status = self.get_object().homeworkstatus_set.last()
+        repo_isreadonly = status.status not in [
             HomeworkStatuses.available.name,
             HomeworkStatuses.execution.name,]
         if self.request.method == 'GET' and repo_isreadonly:
             form.fields['repo'].widget.attrs.update({
                 'readonly': True,
-                'title': 'Вы не пожете редактировать '
+                'title': 'Вы не можете редактировать '
                          'ссылку после отправки'})
+        context.update({
+            'status_sending': self.request.GET.get('status_sending'),
+            'status': status,
+        })
         return context
 
     def post(self,

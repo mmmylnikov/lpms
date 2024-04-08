@@ -23,13 +23,12 @@
             (это поле только для вас - куратор его не увидит)
         </div>
         <div class="text-end mt-3">
-            
-            {% if object.status == 'execution' %}
+            {% if status.status == 'execution' %}
             <button type="submit" class="btn btn-danger btn-sm" name='status_sending' value="available" formnovalidate="TaskUpdateForm">Отменить выполнение</button>
             {% endif %}
             
             <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="{{status_sending}}" >
-                {% if object.status == 'execution' or object.status == 'available' or object.status == 'correction' %}
+                {% if status.status == 'execution' or status.status == 'available' or status.status == 'correction' %}
                 Отправить на проверку
                 {% else %}
                 Обновить комментарий
