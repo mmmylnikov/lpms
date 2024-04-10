@@ -218,7 +218,8 @@ class StudentLearnMeta(LearnMeta):
 class TutorLearnMeta(StudentLearnMeta):
     # review
     students: dict[User, SocialAccount]
-    week_reviews: dict[User, list[Homework | None]] | None = None
+    week_reviews: dict[User, list[tuple[Homework | None,
+                                        HomeworkStatus | None]]] | None = None
 
     def __init__(self,
                  user: User | AnonymousUser,
@@ -233,12 +234,27 @@ class TutorLearnMeta(StudentLearnMeta):
         self.students = {account.user: account for account in accounts}
 
     def get_week_reviews(self) -> None:
+        if isinstance(self.user, AnonymousUser):
+            return None
         reviews = Homework.objects.filter(
             week=self.week, team=self.team,
-            ).select_related('user', 'сhallenge', 'homeworkstatus')
-        week_reviews: dict[User, list[Homework | None]] = dict()
+            ).select_related('user', 'сhallenge', )
+        week_reviews: dict[User, list[tuple[Homework | None,
+                                            HomeworkStatus | None]]] = dict()
+        review_statuses = list(HomeworkStatus.objects.filter(
+            tutor=self.user).select_related('student', 'tutor', 'homework'))
         for review in reviews:
             if not week_reviews.get(review.user):
                 week_reviews[review.user] = []
-            week_reviews[review.user].append(review)
+            student_review_status = [status for status in review_statuses if (
+                status.student == review.user and status.homework == review)]
+            if not student_review_status:
+                continue
+            review_status = student_review_status[0]
+            if review_status.status not in [
+                HomeworkStatuses.review.name,
+                HomeworkStatuses.approved.name,
+            ]:
+                continue
+            week_reviews[review.user].append((review, review_status))
         self.week_reviews = week_reviews

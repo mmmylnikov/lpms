@@ -144,7 +144,7 @@ class StudentTaskView(TaskViewMixin, StudentDashboardView):
                 status = None
             else:
                 status = HomeworkStatus.objects.filter(
-                    homework=task, student=self.request.user).last()
+                    homework=task, student=self.request.user).first()
         context.update({
             'task': task,
             'status': status,
@@ -173,12 +173,12 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         return obj
 
     def get_success_url(self) -> str:
-        return self.request.GET.get('redirect_url', '/')
+        return reverse_lazy('task_update_success')
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         form = context['form']
-        status = self.get_object().homeworkstatus_set.last()
+        status = self.get_object().homeworkstatus_set.first()
         repo_isreadonly = status.status not in [
             HomeworkStatuses.available.name,
             HomeworkStatuses.execution.name,]
@@ -189,6 +189,7 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                          'ссылку после отправки'})
         context.update({
             'status_sending': self.request.GET.get('status_sending'),
+            'status_current': self.request.GET.get('status_current'),
             'status': status,
         })
         return context
@@ -204,8 +205,10 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)
-        status_sending = self.request.POST.get('status_sending', )
-        self.set_obj_status(status=status_sending)
+        status_sending = self.request.POST.get('status_sending')
+        status_current = self.request.GET.get('status_current')
+        if status_sending != status_current:
+            self.set_obj_status(status=status_sending)
         return response
 
 

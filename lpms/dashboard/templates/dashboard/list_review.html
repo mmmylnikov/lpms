@@ -26,11 +26,11 @@
                         </small>
                     </div>
                     {% else %}
-                        {% for review in reviews %}
+                        {% for review, review_status in reviews %}
                         <a href="{% url 'tutor_review_view' week_number team.slug review.сhallenge.pk review.user.username %}" 
                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" aria-current="true">
                             {{ review.сhallenge.name }}                             
-                            <span class="badge text-bg-{{ review.status_color }}"><i class="{{ review.status_icon }}"></i></span>
+                            <span class="badge text-bg-{{ review_status.status_color }}"><i class="{{ review_status.status_icon }}"></i></span>
                         </a>
                         {% endfor %}
                     {% endif %}

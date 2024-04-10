@@ -1,10 +1,20 @@
 from django.db import models
 from django.urls import reverse_lazy
+from django.core.validators import RegexValidator
 from markdown import markdown
 
 from user.models import User
 from course.models import Track, Course, Enrollment, Team
 from learn.enums import HomeworkStatuses
+
+
+class HomeworkRepoValidator(RegexValidator):
+    regex = (r'https:\/\/github.com'
+             r'\/[a-zA-Z0-9-_]*\/[a-zA-Z0-9-_]*'
+             r'\/pull\/[0-9]*')
+    message = ('URL пулл-реквеста должен иметь формат '
+               '"https://github.com/<username>/<repo_name>/pull/<pull_num>"')
+    code = "invalid_url"
 
 
 class Lesson(models.Model):
@@ -137,6 +147,7 @@ class Homework(models.Model):
     comment = models.TextField(null=True, blank=True,
                                verbose_name='Комментарий')
     repo = models.CharField(max_length=512, null=True, blank=True,
+                            validators=[HomeworkRepoValidator()],
                             verbose_name='Репозиторий')
     week = models.ForeignKey(Week, on_delete=models.PROTECT,
                              verbose_name='Неделя')

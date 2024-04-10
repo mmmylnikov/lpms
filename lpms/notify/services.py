@@ -28,19 +28,30 @@ def get_notify_status(user: User) -> str:
 
 def switch_notify(user: User) -> bool:
     bot = TelegramBot()
-    known_user = bot.known_user(user)
-    if not known_user:
-        return False
-    if not user.tg_username:
-        return False
-    chat_id = bot.get_user_chat_id(username=user.tg_username)
-    if not chat_id:
-        return False
-    account, created = Account.objects.get_or_create(
+    user_notify_accounts = Account.objects.filter(
         user=user,
         provider=Provider.objects.get(name=Providers.TELEGRAM_BOT.value),
-        chat_uid=chat_id,
     )
+    if user_notify_accounts.count() == 0:
+        known_user = bot.known_user(user)
+        if not known_user:
+            return False
+        if not user.tg_username:
+            return False
+        chat_id = bot.get_user_chat_id(username=user.tg_username)
+        if not chat_id:
+            return False
+        account, created = Account.objects.get_or_create(
+            user=user,
+            provider=Provider.objects.get(name=Providers.TELEGRAM_BOT.value),
+            chat_uid=chat_id,
+        )
+    else:
+        notify_account = user_notify_accounts.first()
+        if not notify_account:
+            return False
+        account = notify_account
+        chat_id = account.chat_uid
     status = Status(
         user=user,
         account=account,
@@ -75,6 +86,8 @@ def switch_notify(user: User) -> bool:
 
 def send_message_homework_status_update(user: User, message: str) -> None:
     if not user.notify or not user.tg_username:
+        print(('Cообщение не отправлено: выключены уведомления'
+               f'(to: "{user.get_full_name()}", mess:"{message}")'))
         return None
 
     account = Account.objects.get(user=user)

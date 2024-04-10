@@ -18,3 +18,5 @@ class MessageTemplates(Enum):
                       )
     NOTIFY_DISABLED = ('*Понял!* Больше не буду присылать тебе уведомления')
     TASK_STATUS_UPDATE = ('*Смотри!* Статус твоего задания изменился')
+    REVIEW_NEW_STATUS_UPDATE = ('*Смотри!* Тебе прислали работу на проверку')
+    REVIEW_STATUS_UPDATE = ('*Ух ты!* Твой студент получил новенькое ревью')

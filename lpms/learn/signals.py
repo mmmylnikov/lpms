@@ -16,6 +16,7 @@ def send_message_handler(
         instance: HomeworkStatus,
         *args: tuple, **kwargs: dict[str, Any]) -> None:
     status = instance.status
+    # Student notify
     if status != HomeworkStatuses.available.name:
         message = MessageTemplates.TASK_STATUS_UPDATE.value
         status_text = HomeworkStatuses[status].value.label
@@ -24,3 +25,15 @@ def send_message_handler(
         message += f'Задание: `{instance.homework.сhallenge.name}`'
         send_message_homework_status_update(user=instance.student,
                                             message=message)
+    # Tutor notify
+    if status == HomeworkStatuses.review.name:
+        message = MessageTemplates.REVIEW_NEW_STATUS_UPDATE.value
+        message += f'\nот: "`{instance.student.get_full_name()}`".\n'
+        message += f'задание: `{instance.homework.сhallenge.name}`'
+        send_message_homework_status_update(user=instance.tutor,
+                                            message=message)
+    if status in [HomeworkStatuses.correction.name,
+                  HomeworkStatuses.approved.name]:
+        message = MessageTemplates.REVIEW_STATUS_UPDATE.value
+        message += f'\nстудент: "`{instance.student.get_full_name()}`".\n'
+        message += f'задание: `{instance.homework.сhallenge.name}`'
