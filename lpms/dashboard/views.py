@@ -16,6 +16,7 @@ from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta
 from learn.enums import HomeworkStatuses
 from user.models import Repo, Pull, User
+from user.utils import GithubApi
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -235,7 +236,7 @@ class ReviewViewMixin(LoginRequiredMixin, TemplateView):
 
 class TutorReviewView(ReviewViewMixin, TutorDashboardView):
     review: Homework | None = None
-    review_status: HomeworkStatus | None = None
+    status: HomeworkStatus | None = None
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
@@ -250,15 +251,59 @@ class TutorReviewView(ReviewViewMixin, TutorDashboardView):
         })
         if isinstance(self.request.user, AnonymousUser):
             return context
-        self.review_status = HomeworkStatus.objects.filter(
+        self.status = HomeworkStatus.objects.filter(
             student=self.student,
             tutor=self.request.user,
             homework=self.review,
         ).first()
         context.update({
-            'review_status': self.review_status,
+            'status': self.status,
         })
         return context
+
+
+class TutorReviewCheckView(TemplateView):
+    template_name = 'dashboard/review_check.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        review = Homework.objects.get(pk=self.kwargs['review_id'])
+        status = HomeworkStatus.objects.get(pk=self.kwargs['status_id'])
+        if status.status != HomeworkStatuses.review.name:
+            context.update({'new_status': None, 'reason': 'already_review'})
+            return context
+        tutor_github_login = self.kwargs['tutor_github_login']
+        if not review.repo:
+            context.update({'new_status': None, 'reason': 'repo_isnotvalid'})
+            return context
+        pr_reviews = GithubApi().get_pr_by_url(url=review.repo)
+        pr_reviews_commented = [pr for pr in pr_reviews if (
+            pr.state == 'COMMENTED' and pr.user.login == tutor_github_login)]
+        pr_reviews_approved = [pr for pr in pr_reviews if (
+            pr.state == 'APPROVED' and pr.user.login == tutor_github_login)]
+        if pr_reviews_approved:
+            new_status = HomeworkStatus(
+                student=status.student,
+                tutor=status.tutor,
+                homework=status.homework,
+                status=HomeworkStatuses.approved.name,
+            )
+            new_status.save()
+            context.update({'new_status': new_status})
+            return context
+        elif pr_reviews_commented:
+            new_status = HomeworkStatus(
+                student=status.student,
+                tutor=status.tutor,
+                homework=status.homework,
+                status=HomeworkStatuses.correction.name,
+            )
+            new_status.save()
+            context.update({'new_status': new_status})
+            return context
+        else:
+            context.update({'new_status': None, 'reason': 'no_data'})
+            return context
 
 
 class PullAutocompleteView(TemplateView):

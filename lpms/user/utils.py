@@ -2,6 +2,7 @@ from github import Github
 from github.Auth import Auth, Token
 from github.Repository import Repository
 from github.PullRequest import PullRequest
+from github.PullRequestReview import PullRequestReview
 
 from config.settings import GITHUB_API_TOKEN
 
@@ -50,3 +51,15 @@ class GithubApi:
         self._rate_limiting()
         self._disconnect()
         return pulls
+
+    def get_pr_by_url(self, url: str) -> list[PullRequestReview]:
+        self._connect()
+        items = url.split('/')
+        repo_fullname = f'{items[3]}/{items[4]}'
+        pull_num = int(items[6])
+        repo = self.api.get_repo(repo_fullname)
+        pr = repo.get_pull(pull_num)
+        reviews = pr.get_reviews()
+        self._rate_limiting()
+        self._disconnect()
+        return list(reviews)

@@ -1,0 +1,30 @@
+{% if new_status %}
+    {% if new_status.status == 'approved' %}
+    <div class="alert alert-success text-center" role="alert">
+        <i class="bi bi-check-square"></i> 
+        Работа принята!
+    </div>
+    {% elif new_status.status == 'correction' %}
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-pencil-square"></i> 
+        Работа отправлена на устранение замечаний!
+    </div>
+    {% endif%}
+{% else %}
+    {% if reason == 'already_review' %}
+    <div class="alert alert-info text-center" role="alert">
+        <i class="bi bi-info-circle"></i> 
+        Вы уже проверили эту работу!
+    </div>
+    {% elif reason == 'no_data' %}
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-circle"></i> 
+        Похоже, вы не оставили комментарий в пулл-реквесте!
+    </div>
+    {% elif reason == 'repo_isnotvalid' %}
+    <div class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-circle"></i> 
+        К сожалению адрес пулл-реквеста не валидный
+    </div>
+    {% endif %}
+{% endif %}

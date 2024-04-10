@@ -1,0 +1,43 @@
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title">Проверка работы</h5>
+            <span>
+                <button type="button" class="btn btn-light btn-sm " 
+                        data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                        data-bs-title="Дата последнего обновления">
+                        <i class="bi bi-calendar3"></i>
+                    <small class="fw-lighter"> {{ review.updated_at|date:"d.m.Y H:i" }}</small>
+                </button>
+            </span>
+        </div>
+        <div class="mb-3">
+            <label for="InputRepo" class="form-label">Ссылка на пулл-реквест</label>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="basic-addon2" 
+                       value="{{ review.repo }}" readonly>                
+                <span class="input-group-text" id="basic-addon1">
+                    <i class="bi bi-github"></i>&nbsp;
+                    <a href="{{review.repo.value}}" target="_blank">
+                        Посмотреть на GitHub
+                    </a>
+                </span>
+            </div>
+            <div class="d-grid gap-2 mx-auto">
+                {% if status.status == 'review' %}
+                <button type="button" class="btn btn-outline-success"
+                    hx-get="{% url 'review_check_view' review.pk status.pk learn_meta.user_github.extra_data.login %}" 
+                    hx-trigger="click" hx-swap="innerHTML" hx-target="#review-github-check">
+                    Работа проверена
+                    <div class="htmx-indicator spinner-border spinner-border-sm" role="status"></div>
+                </button> 
+                {% endif %}
+            </div>
+            
+        </div>
+        <div id="review-github-check">            
+        </div>               
+    </div>
+</div>

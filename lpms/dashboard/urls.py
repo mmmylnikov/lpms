@@ -1,10 +1,11 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from dashboard.views import (StudentDashboardView, TutorDashboardView,
-                             ContentView,
-                             StudentTaskView, TutorReviewView, TaskUpdateView,
-                             PullAutocompleteView,)
+from dashboard.views import (StudentDashboardView, StudentTaskView,
+                             TutorDashboardView, TutorReviewView,
+                             ContentView, PullAutocompleteView,
+                             TaskUpdateView, TutorReviewCheckView,
+                             )
 
 
 urlpatterns = [
@@ -28,7 +29,9 @@ urlpatterns = [
      path('task/update/success/', TemplateView.as_view(
           template_name='dashboard/task_execution_form_valid.html'),
           name='task_update_success'),
-
+     path('review/check/<int:review_id>/<int:status_id>/<str:tutor_github_login>/',  # noqa
+          TutorReviewCheckView.as_view(),
+          name='review_check_view'),
      # form autocomplete
      path('autocomplete/pull/',
           PullAutocompleteView.as_view(),
