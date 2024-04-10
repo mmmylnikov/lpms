@@ -15,7 +15,7 @@ from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta
 from learn.enums import HomeworkStatuses
-from user.models import Repo, Pull
+from user.models import Repo, Pull, User
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -212,8 +212,53 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         return response
 
 
-class TutorReviewView(TutorDashboardView):
-    pass
+class ReviewViewMixin(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/review.html"
+    сhallenge: Challenge
+    track: Track
+    student: User
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        challenge_id = str(kwargs['сhallenge_id'])
+        username = str(kwargs['username'])
+        self.сhallenge = Challenge.objects.get(pk=challenge_id)
+        self.track = self.сhallenge.track
+        self.student = User.objects.get(username=username)
+        context.update({
+            'сhallenge': self.сhallenge,
+            'track': self.track,
+            'student': self.student,
+        })
+        return context
+
+
+class TutorReviewView(ReviewViewMixin, TutorDashboardView):
+    review: Homework | None = None
+    review_status: HomeworkStatus | None = None
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        self.review = Homework.objects.filter(
+            user=self.student,
+            сhallenge=self.сhallenge,
+            team=self.team,
+            week=context['learn_meta'].week
+        ).first()
+        context.update({
+            'review': self.review,
+        })
+        if isinstance(self.request.user, AnonymousUser):
+            return context
+        self.review_status = HomeworkStatus.objects.filter(
+            student=self.student,
+            tutor=self.request.user,
+            homework=self.review,
+        ).first()
+        context.update({
+            'review_status': self.review_status,
+        })
+        return context
 
 
 class PullAutocompleteView(TemplateView):

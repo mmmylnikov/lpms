@@ -1,0 +1,22 @@
+<div class="card mb-3">
+    <div class="card-header bg-{{status.status_color}}-subtle">
+        <div class="row">
+            <div class="col">
+                Ревью                
+            </div>
+            <div class="col text-end"> 
+                <small class="fw-lighter">
+                    {{status.status_label}}  <i class="{{status.status_icon}}"></i>
+                </small>
+            </div>
+        </div>
+        
+    </div>
+    <div class="card-body">
+        {% comment %}
+        {% include 'dashboard/task_execution_info.html' %}
+        {% include 'dashboard/task_execution_form.html' %}
+        {% endcomment %}
+    </div>
+    
+</div>

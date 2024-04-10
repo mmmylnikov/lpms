@@ -86,8 +86,8 @@ def switch_notify(user: User) -> bool:
 
 def send_message_homework_status_update(user: User, message: str) -> None:
     if not user.notify or not user.tg_username:
-        print(('Cообщение не отправлено: выключены уведомления'
-               f'(to: "{user.get_full_name()}", mess:"{message}")'))
+        # print(('Cообщение не отправлено: выключены уведомления'
+        #        f'(to: "{user.get_full_name()}", mess:"{message}")'))
         return None
 
     account = Account.objects.get(user=user)
