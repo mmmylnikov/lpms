@@ -22,18 +22,18 @@ def send_message_handler(
         status_text = HomeworkStatuses[status].value.label
 
         message += f' на "{status_text}".\n'
-        message += f'Задание: `{instance.homework.сhallenge.name}`'
+        message += f'Задание: `{instance.homework.challenge.name}`'
         send_message_homework_status_update(user=instance.student,
                                             message=message)
     # Tutor notify
     if status == HomeworkStatuses.review.name:
         message = MessageTemplates.REVIEW_NEW_STATUS_UPDATE.value
         message += f'\nот: "`{instance.student.get_full_name()}`".\n'
-        message += f'задание: `{instance.homework.сhallenge.name}`'
+        message += f'задание: `{instance.homework.challenge.name}`'
         send_message_homework_status_update(user=instance.tutor,
                                             message=message)
     if status in [HomeworkStatuses.correction.name,
                   HomeworkStatuses.approved.name]:
         message = MessageTemplates.REVIEW_STATUS_UPDATE.value
         message += f'\nстудент: "`{instance.student.get_full_name()}`".\n'
-        message += f'задание: `{instance.homework.сhallenge.name}`'
+        message += f'задание: `{instance.homework.challenge.name}`'

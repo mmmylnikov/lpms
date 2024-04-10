@@ -27,13 +27,13 @@
                     </div>
                     {% else %}
                         {% for review, review_status in reviews %}
-                        <a href="{% url 'tutor_review_view' week_number team.slug review.сhallenge.pk review.user.username %}" 
+                        <a href="{% url 'tutor_review_view' week_number team.slug review.challenge.pk review.user.username %}" 
                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-start
-                                    {% if review.сhallenge == challenge and review.user == student  %}
+                                    {% if review.challenge == challenge and review.user == student  %}
                                     active
                                     {% endif %}
                            " aria-current="true">
-                            {{ review.сhallenge.name }}                             
+                            {{ review.challenge.name }}                             
                             <span class="badge text-bg-{{ review_status.status_color }}"><i class="{{ review_status.status_icon }}"></i></span>
                         </a>
                         {% endfor %}

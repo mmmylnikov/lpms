@@ -14,7 +14,7 @@
                         {% if status.status == 'execution' %}
                         <a href="{{status.homework.get_student_absolute_url}}" 
                            class="list-group-item list-group-item-action " aria-current="true">
-                            <small>{{ status.homework.сhallenge.name }}</small>
+                            <small>{{ status.homework.challenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}
@@ -31,7 +31,7 @@
                         {% if status.status == 'review' %}
                         <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
                             aria-current="true">
-                            <small>{{ status.homework.сhallenge.name }}</small>
+                            <small>{{ status.homework.challenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}
@@ -48,7 +48,7 @@
                         {% if status.status == 'correction' %}
                         <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
                             aria-current="true">
-                            <small>{{ status.homework.сhallenge.name }}</small>
+                            <small>{{ status.homework.challenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}
@@ -65,7 +65,7 @@
                         {% if status.status == 'approved' %}
                         <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
                             aria-current="true">
-                            <small>{{ status.homework.сhallenge.name }}</small>
+                            <small>{{ status.homework.challenge.name }}</small>
                         </a>
                         {% endif %}
                         {% endfor %}

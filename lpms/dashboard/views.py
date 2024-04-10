@@ -109,7 +109,7 @@ class TaskViewMixin(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
-        challenge_id = str(kwargs['сhallenge_id'])
+        challenge_id = str(kwargs['challenge_id'])
         self.challenge = Challenge.objects.get(pk=challenge_id)
         self.track = self.challenge.track
         context.update({
@@ -126,7 +126,7 @@ class StudentTaskView(TaskViewMixin, StudentDashboardView):
             return context
         task, created = Homework.objects.get_or_create(
             user=self.request.user,
-            сhallenge=context['challenge'],
+            challenge=context['challenge'],
             week=context['week'],
             team=self.team,
         )
@@ -214,19 +214,19 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
 
 class ReviewViewMixin(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/review.html"
-    сhallenge: Challenge
+    challenge: Challenge
     track: Track
     student: User
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
-        challenge_id = str(kwargs['сhallenge_id'])
+        challenge_id = str(kwargs['challenge_id'])
         username = str(kwargs['username'])
-        self.сhallenge = Challenge.objects.get(pk=challenge_id)
-        self.track = self.сhallenge.track
+        self.challenge = Challenge.objects.get(pk=challenge_id)
+        self.track = self.challenge.track
         self.student = User.objects.get(username=username)
         context.update({
-            'сhallenge': self.сhallenge,
+            'challenge': self.challenge,
             'track': self.track,
             'student': self.student,
         })
@@ -241,7 +241,7 @@ class TutorReviewView(ReviewViewMixin, TutorDashboardView):
         context = super().get_context_data(**kwargs)
         self.review = Homework.objects.filter(
             user=self.student,
-            сhallenge=self.сhallenge,
+            challenge=self.challenge,
             team=self.team,
             week=context['learn_meta'].week
         ).first()

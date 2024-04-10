@@ -142,7 +142,7 @@ class Week(models.Model):
 class Homework(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT,
                              verbose_name='Пользователь')
-    сhallenge = models.ForeignKey(Challenge, on_delete=models.PROTECT,
+    challenge = models.ForeignKey(Challenge, on_delete=models.PROTECT,
                                   verbose_name='Задание')
     comment = models.TextField(null=True, blank=True,
                                verbose_name='Комментарий')
@@ -157,13 +157,13 @@ class Homework(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
     def __str__(self) -> str:
-        return f'{self.сhallenge} ({self.user.get_full_name()})'
+        return f'{self.challenge} ({self.user.get_full_name()})'
 
     def get_student_absolute_url(self) -> str:
         return reverse_lazy("student_task_view", kwargs={
             'week_number': self.week.number,
             'team_slug': self.team.slug,
-            'сhallenge_id': self.сhallenge.pk,
+            'challenge_id': self.challenge.pk,
             })
 
     class Meta:

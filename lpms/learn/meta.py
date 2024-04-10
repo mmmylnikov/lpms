@@ -56,11 +56,11 @@ class LearnMeta:
                 HomeworkStatuses.approved.name,
                 HomeworkStatuses.available.name])
         self.tasks_learn = tasks_learn.select_related(
-                    'сhallenge', 'сhallenge__track', 'week',
+                    'challenge', 'challenge__track', 'week',
                     'team', 'team__enrollment', 'team__enrollment__course')
         self.tasks_status_learn = HomeworkStatus.objects.filter(
             homework__in=self.tasks_learn).select_related(
-                'homework', 'homework__сhallenge',
+                'homework', 'homework__challenge',
                 'homework__week',
                 'homework__team', 'homework__team__enrollment',
                 'homework__team__enrollment__course', )
@@ -73,10 +73,10 @@ class LearnMeta:
         tasks_latest = []
         challenge_set: set[Challenge] = set()
         for task in tasks_all:
-            сhallenge = task.homework.сhallenge
-            if сhallenge in challenge_set:
+            challenge = task.homework.challenge
+            if challenge in challenge_set:
                 continue
-            challenge_set.add(сhallenge)
+            challenge_set.add(challenge)
             tasks_latest.append(task)
         return tasks_latest
 
@@ -199,7 +199,7 @@ class StudentLearnMeta(LearnMeta):
                 task = None
                 task_status = None
                 week_tasks = [
-                    task for task in tasks if task.сhallenge == challenge]
+                    task for task in tasks if task.challenge == challenge]
                 if week_tasks:
                     task = week_tasks[0]
                     task_statuses = [
@@ -238,7 +238,7 @@ class TutorLearnMeta(StudentLearnMeta):
             return None
         reviews = Homework.objects.filter(
             week=self.week, team=self.team,
-            ).select_related('user', 'сhallenge', )
+            ).select_related('user', 'challenge', )
         week_reviews: dict[User, list[tuple[Homework | None,
                                             HomeworkStatus | None]]] = dict()
         review_statuses = list(HomeworkStatus.objects.filter(
