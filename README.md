@@ -1,3 +1,6 @@
+<center><img src="demo/lpms-logo.png"></center>
+<br>
+
 # Learn Python. Management system (LPMS)
 
 > Настоящий проект реализуется в рамках подготовки итоговой выпускной работы студента набора LPA5 курса Learn Python Advanced
@@ -32,3 +35,10 @@ LPMS - Это система управления обучением для ку
 - Журнал разработки
   - [Задачи](https://mmmylnikov.github.io/lpms-docs/devlog/todo/)
   - [История версий](https://mmmylnikov.github.io/lpms-docs/devlog/log/)
+
+<hr>
+<center>© 2024 LPMS | Система управления курсами программирования</center>
+
+<center><img src="demo/made-in-russia-sign-en.png" height="24px"></center>
+
+
