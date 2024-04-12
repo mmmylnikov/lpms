@@ -1,0 +1,29 @@
+#header {
+    background: #6c757d;
+}
+
+#header, .module caption {
+    background: #6c757d;
+}
+
+#user-tools > button > svg.theme-icon-when-auto, 
+#user-tools > button > svg.theme-icon-when-light,
+#user-tools > button > svg.theme-icon-when-dark,
+#branding > button > svg.theme-icon-when-auto,
+#branding > button > svg.theme-icon-when-light,
+#branding > button > svg.theme-icon-when-dark {
+    color: #6c757d;
+}
+
+div.breadcrumbs {
+    background: #8d8e90;
+}
+ 
+.module h2, .module caption, .inline-group h2 {
+    background: #6c757d;
+}
+
+#site-name > a:visited,
+#user-tools {
+    color: #f8f9fa;
+}

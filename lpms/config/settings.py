@@ -121,6 +121,10 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = SHARED_ROOT / 'static'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = [

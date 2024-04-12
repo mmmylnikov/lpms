@@ -8,3 +8,6 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
 ]
+
+admin.site.site_header = "Панель администрирования LPMS"
+admin.site.index_title = "LPMS | Администрирование портала"

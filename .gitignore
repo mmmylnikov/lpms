@@ -161,6 +161,7 @@ cython_debug/
 .DS_Store
 sandbox.ipynb
 sandbox.py
-static/
+lpms/shared/static/
 docker-compose.debug.yml
 lpms/db_test.json
+dev/
