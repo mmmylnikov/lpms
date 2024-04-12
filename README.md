@@ -14,11 +14,18 @@ LPMS - Это система управления обучением для ку
 - Сбор и анализ статистики обучения
 - Автоматизация процессов управления обучением
 
-## [Материалы](https://mmmylnikov.github.io/lpms-docs/)
 
-- [Быстрый старт](https://mmmylnikov.github.io/lpms-docs/start/)
+## [Материалы](https://mmmylnikov.github.io/lpms-docs/)
+- Быстрый старт
+  - [Установка и настройка](https://mmmylnikov.github.io/lpms-docs/start/)
   - [Переменные окружения](https://mmmylnikov.github.io/lpms-docs/start/env/)
   - [Зависимоcти](https://mmmylnikov.github.io/lpms-docs/start/requirements/)
+- Описание системы
+  - [Цель проекта](https://mmmylnikov.github.io/terms/object/)
+  - [Функциональные блоки](https://mmmylnikov.github.io/terms/description/)
+  - [Предлагаемый стек технологий](https://mmmylnikov.github.io/terms/stack/)
+  - [Требования к дизайну](https://mmmylnikov.github.io/terms/styling/)
+  - [ER-модель](https://mmmylnikov.github.io/terms/erd/)
 - Скриншоты интерфейса
   - [Авторизация и профили](https://mmmylnikov.github.io/lpms-docs/screenshots/auth/)
   - [Процесс обучения](https://mmmylnikov.github.io/lpms-docs/screenshots/learn/)
