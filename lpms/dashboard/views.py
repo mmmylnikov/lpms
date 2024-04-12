@@ -306,7 +306,7 @@ class TutorReviewCheckView(TemplateView):
             return context
 
 
-class PullAutocompleteView(TemplateView):
+class PullAutocompleteView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/pull_autocomplete.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

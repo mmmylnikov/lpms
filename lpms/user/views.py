@@ -3,11 +3,11 @@ from typing import Any
 from django.http.response import HttpResponse as HttpResponse
 from django.urls import reverse_lazy
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 from django.shortcuts import redirect
-
 
 from user.models import User
 from user.forms import UserUpdateForm
@@ -28,7 +28,7 @@ class UserDetailView(DetailView):
         return context
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
 
@@ -40,7 +40,7 @@ class UserUpdateView(UpdateView):
         return 'username'
 
 
-class UserNotifySwitchView(TemplateView):
+class UserNotifySwitchView(LoginRequiredMixin, TemplateView):
     template_name = 'user/user_notify_switch.html'
 
     def render_to_response(self,
@@ -58,7 +58,7 @@ class UserNotifySwitchView(TemplateView):
         return context
 
 
-class UserNotifyStatusView(TemplateView):
+class UserNotifyStatusView(LoginRequiredMixin, TemplateView):
     template_name = 'user/user_notify_status.html'
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
