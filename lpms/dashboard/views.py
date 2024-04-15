@@ -265,6 +265,33 @@ class TutorReviewView(ReviewViewMixin, TutorDashboardView):
 class TutorReviewCheckView(TemplateView):
     template_name = 'dashboard/review_check.html'
 
+    def __add_status(self,
+                     early_status_instance: HomeworkStatus,
+                     status: HomeworkStatuses) -> HomeworkStatus:
+        new_status = HomeworkStatus(
+                student=early_status_instance.student,
+                tutor=early_status_instance.tutor,
+                homework=early_status_instance.homework,
+                status=status.name,
+            )
+        new_status.save()
+        return new_status
+
+    def __get_github_pr_status(self,
+                               pr_url: str,
+                               tutor_github_login: str) -> HomeworkStatuses:
+        pr_reviews = GithubApi().get_pr_by_url(url=pr_url)
+        if [pr for pr in pr_reviews if (
+                pr.state == 'APPROVED'
+                and pr.user.login == tutor_github_login)]:
+            return HomeworkStatuses.approved
+        elif [pr for pr in pr_reviews if (
+                pr.state == 'COMMENTED'
+                and pr.user.login == tutor_github_login)]:
+            return HomeworkStatuses.correction
+        else:
+            return HomeworkStatuses.review
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         review = Homework.objects.get(pk=self.kwargs['review_id'])
@@ -272,33 +299,21 @@ class TutorReviewCheckView(TemplateView):
         if status.status != HomeworkStatuses.review.name:
             context.update({'new_status': None, 'reason': 'already_review'})
             return context
-        tutor_github_login = self.kwargs['tutor_github_login']
         if not review.repo:
             context.update({'new_status': None, 'reason': 'repo_isnotvalid'})
             return context
-        pr_reviews = GithubApi().get_pr_by_url(url=review.repo)
-        pr_reviews_commented = [pr for pr in pr_reviews if (
-            pr.state == 'COMMENTED' and pr.user.login == tutor_github_login)]
-        pr_reviews_approved = [pr for pr in pr_reviews if (
-            pr.state == 'APPROVED' and pr.user.login == tutor_github_login)]
-        if pr_reviews_approved:
-            new_status = HomeworkStatus(
-                student=status.student,
-                tutor=status.tutor,
-                homework=status.homework,
-                status=HomeworkStatuses.approved.name,
-            )
-            new_status.save()
+        github_pr_status = self.__get_github_pr_status(
+            pr_url=review.repo,
+            tutor_github_login=self.kwargs['tutor_github_login']
+        )
+        if github_pr_status == HomeworkStatuses.approved:
+            new_status = self.__add_status(
+                status, HomeworkStatuses.approved)
             context.update({'new_status': new_status})
             return context
-        elif pr_reviews_commented:
-            new_status = HomeworkStatus(
-                student=status.student,
-                tutor=status.tutor,
-                homework=status.homework,
-                status=HomeworkStatuses.correction.name,
-            )
-            new_status.save()
+        elif github_pr_status == HomeworkStatuses.correction:
+            new_status = self.__add_status(
+                status, HomeworkStatuses.correction)
             context.update({'new_status': new_status})
             return context
         else:
