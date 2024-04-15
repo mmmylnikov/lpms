@@ -195,7 +195,8 @@ class StudentLearnMeta(LearnMeta):
             return self
         for track, homework in self.week_challenges.items():
             week_homework = []
-            for challenge, _, _ in homework:  # type: ignore
+            challenges = [items[0] for items in homework]
+            for challenge in challenges:
                 task = None
                 task_status = None
                 week_tasks = [
@@ -211,7 +212,7 @@ class StudentLearnMeta(LearnMeta):
             week_challenges.update({
                 track: week_homework,
             })
-        self.week_challenges = week_challenges  # type: ignore
+        self.week_challenges = week_challenges
         return self
 
 
