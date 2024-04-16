@@ -129,9 +129,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+INTERNAL_IPS = getenv('INTERNAL_IPS', '').split(',')
 
 
 # GitHub OAuth
@@ -145,7 +143,7 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_EMAIL_VERIFICATION = "none"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-CALLBACK_URL_YOU_SET_ON_GITHUB = 'http://localhost:8002/oauth/callback'
+CALLBACK_URL_YOU_SET_ON_GITHUB = 'http://localhost:8000/oauth/callback'
 
 SOCIALACCOUNT_PROVIDERS = {
     "github": {
