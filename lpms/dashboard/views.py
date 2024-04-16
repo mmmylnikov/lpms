@@ -9,12 +9,14 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse
 
+
 from course.models import Team
-from learn.models import Lesson, Challenge, Track, Homework
+from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta
 from learn.enums import HomeworkStatuses
-from user.models import Repo, Pull
+from user.models import Repo, Pull, User
+from user.utils import GithubApi
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -72,7 +74,7 @@ class TutorDashboardView(DashboardView):
         return context
 
 
-class ContentView(TemplateView):
+class ContentView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/content.html"
 
     class SectionMapper(Enum):
@@ -101,14 +103,14 @@ class ContentView(TemplateView):
         return context
 
 
-class TaskViewMixin(TemplateView):
+class TaskViewMixin(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/task.html"
     challenge: Challenge
     track: Track
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
-        challenge_id = str(kwargs['сhallenge_id'])
+        challenge_id = str(kwargs['challenge_id'])
         self.challenge = Challenge.objects.get(pk=challenge_id)
         self.track = self.challenge.track
         context.update({
@@ -121,48 +123,76 @@ class TaskViewMixin(TemplateView):
 class StudentTaskView(TaskViewMixin, StudentDashboardView):
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
+        if isinstance(self.request.user, AnonymousUser):
+            return context
         task, created = Homework.objects.get_or_create(
             user=self.request.user,
-            сhallenge=context['challenge'],
+            challenge=context['challenge'],
             week=context['week'],
             team=self.team,
         )
         if created:
-            task.status = 'execution'
+            status = HomeworkStatus(
+                student=self.request.user,
+                tutor=self.team.tutor,
+                homework=task,
+                status=HomeworkStatuses.execution.name,
+            )
+            status.save()
             task.save()
+        else:
+            if not task:
+                status = None
+            else:
+                status = HomeworkStatus.objects.filter(
+                    homework=task, student=self.request.user).first()
         context.update({
             'task': task,
+            'status': status,
             'status_sending': 'review',
         })
         return context
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
     model = Homework
     form_class = TaskUpdateForm
     template_name = 'dashboard/task_update_form.html'
 
     def set_obj_status(self, status: str | None) -> Homework:
-        obj = self.get_object()
-        obj.status = status
-        obj.save()
+        obj: Homework = self.get_object()
+        if isinstance(self.request.user, AnonymousUser):
+            return obj
+        if not status:
+            return obj
+        HomeworkStatus(
+            student=self.request.user,
+            tutor=obj.team.tutor,
+            status=status,
+            homework=obj,
+        ).save()
         return obj
 
     def get_success_url(self) -> str:
-        return self.request.GET.get('redirect_url', '/')
+        return reverse_lazy('task_update_success')
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context['status_sending'] = self.request.GET.get('status_sending')
         form = context['form']
-        repo_isreadonly = form.instance.status not in [
+        status = self.get_object().homeworkstatus_set.first()
+        repo_isreadonly = status.status not in [
             HomeworkStatuses.available.name,
             HomeworkStatuses.execution.name,]
         if self.request.method == 'GET' and repo_isreadonly:
             form.fields['repo'].widget.attrs.update({
                 'readonly': True,
-                'title': 'Вы не пожете редактировать '
+                'title': 'Вы не можете редактировать '
                          'ссылку после отправки'})
+        context.update({
+            'status_sending': self.request.GET.get('status_sending'),
+            'status_current': self.request.GET.get('status_current'),
+            'status': status,
+        })
         return context
 
     def post(self,
@@ -176,16 +206,122 @@ class TaskUpdateView(UpdateView):
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)
-        status_sending = self.request.POST.get('status_sending', )
-        self.set_obj_status(status=status_sending)
+        status_sending = self.request.POST.get('status_sending')
+        status_current = self.request.GET.get('status_current')
+        if status_sending != status_current:
+            self.set_obj_status(status=status_sending)
         return response
 
 
-class TutorReviewView(TutorDashboardView):
-    pass
+class ReviewViewMixin(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/review.html"
+    challenge: Challenge
+    track: Track
+    student: User
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        challenge_id = str(kwargs['challenge_id'])
+        username = str(kwargs['username'])
+        self.challenge = Challenge.objects.get(pk=challenge_id)
+        self.track = self.challenge.track
+        self.student = User.objects.get(username=username)
+        context.update({
+            'challenge': self.challenge,
+            'track': self.track,
+            'student': self.student,
+        })
+        return context
 
 
-class PullAutocompleteView(TemplateView):
+class TutorReviewView(ReviewViewMixin, TutorDashboardView):
+    review: Homework | None = None
+    status: HomeworkStatus | None = None
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        self.review = Homework.objects.filter(
+            user=self.student,
+            challenge=self.challenge,
+            team=self.team,
+            week=context['learn_meta'].week
+        ).first()
+        context.update({
+            'review': self.review,
+        })
+        if isinstance(self.request.user, AnonymousUser):
+            return context
+        self.status = HomeworkStatus.objects.filter(
+            student=self.student,
+            tutor=self.request.user,
+            homework=self.review,
+        ).first()
+        context.update({
+            'status': self.status,
+        })
+        return context
+
+
+class TutorReviewCheckView(TemplateView):
+    template_name = 'dashboard/review_check.html'
+
+    def __add_status(self,
+                     early_status_instance: HomeworkStatus,
+                     status: HomeworkStatuses) -> HomeworkStatus:
+        new_status = HomeworkStatus(
+                student=early_status_instance.student,
+                tutor=early_status_instance.tutor,
+                homework=early_status_instance.homework,
+                status=status.name,
+            )
+        new_status.save()
+        return new_status
+
+    def __get_github_pr_status(self,
+                               pr_url: str,
+                               tutor_github_login: str) -> HomeworkStatuses:
+        pr_reviews = GithubApi().get_pr_by_url(url=pr_url)
+        if [pr for pr in pr_reviews if (
+                pr.state == 'APPROVED'
+                and pr.user.login == tutor_github_login)]:
+            return HomeworkStatuses.approved
+        elif [pr for pr in pr_reviews if (
+                pr.state == 'COMMENTED'
+                and pr.user.login == tutor_github_login)]:
+            return HomeworkStatuses.correction
+        else:
+            return HomeworkStatuses.review
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        review = Homework.objects.get(pk=self.kwargs['review_id'])
+        status = HomeworkStatus.objects.get(pk=self.kwargs['status_id'])
+        if status.status != HomeworkStatuses.review.name:
+            context.update({'new_status': None, 'reason': 'already_review'})
+            return context
+        if not review.repo:
+            context.update({'new_status': None, 'reason': 'repo_isnotvalid'})
+            return context
+        github_pr_status = self.__get_github_pr_status(
+            pr_url=review.repo,
+            tutor_github_login=self.kwargs['tutor_github_login']
+        )
+        if github_pr_status == HomeworkStatuses.approved:
+            new_status = self.__add_status(
+                status, HomeworkStatuses.approved)
+            context.update({'new_status': new_status})
+            return context
+        elif github_pr_status == HomeworkStatuses.correction:
+            new_status = self.__add_status(
+                status, HomeworkStatuses.correction)
+            context.update({'new_status': new_status})
+            return context
+        else:
+            context.update({'new_status': None, 'reason': 'no_data'})
+            return context
+
+
+class PullAutocompleteView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/pull_autocomplete.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:

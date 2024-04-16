@@ -1,9 +1,11 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
-from dashboard.views import (StudentDashboardView, TutorDashboardView,
-                             ContentView,
-                             StudentTaskView, TutorReviewView, TaskUpdateView,
-                             PullAutocompleteView,)
+from dashboard.views import (StudentDashboardView, StudentTaskView,
+                             TutorDashboardView, TutorReviewView,
+                             ContentView, PullAutocompleteView,
+                             TaskUpdateView, TutorReviewCheckView,
+                             )
 
 
 urlpatterns = [
@@ -17,14 +19,19 @@ urlpatterns = [
 
      # dashboard: task (execution and review)
      path('learn/week/<int:week_number>/team/<slug:team_slug>/'
-          'task/<int:сhallenge_id>/',
+          'task/<int:challenge_id>/',
           StudentTaskView.as_view(), name='student_task_view'),
      path('review/week/<int:week_number>/team/<slug:team_slug>/'
-          'task/<int:сhallenge_id>/user/<str:username>/',
+          'task/<int:challenge_id>/user/<str:username>/',
           TutorReviewView.as_view(), name='tutor_review_view'),
      path('task/<int:pk>/update/', TaskUpdateView.as_view(),
           name='task_update_view'),
-
+     path('task/update/success/', TemplateView.as_view(
+          template_name='dashboard/task_execution_form_valid.html'),
+          name='task_update_success'),
+     path('review/check/<int:review_id>/<int:status_id>/<str:tutor_github_login>/',  # noqa
+          TutorReviewCheckView.as_view(),
+          name='review_check_view'),
      # form autocomplete
      path('autocomplete/pull/',
           PullAutocompleteView.as_view(),

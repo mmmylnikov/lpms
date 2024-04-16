@@ -15,9 +15,6 @@ class TaskUpdateForm(forms.ModelForm):
                                     'pull_autocomplete_view'),
                                 'hx-target': "#repo_options",
                                 'hx-trigger': "load, keyup delay:2000ms",
-                                'pattern': r'https:\/\/github.com'
-                                           r'\/[a-zA-Z0-9-_]*\/[a-zA-Z0-9-_]*'
-                                           r'\/pull\/[0-9]*',
                                 }))
     comment = forms.CharField(label='Комментарий', required=False,
                               widget=forms.Textarea(

@@ -1,35 +1,62 @@
 
-<form method="post" id="TaskUpdateForm" action="{% url 'task_update_view' homework.pk %}?status_sending={{status_sending}}&redirect_url={{request.GET.redirect_url}}">
+<form method="post" id="TaskUpdateForm" 
+      hx-post="{% url 'task_update_view' homework.pk %}?status_sending={{status_sending}}&status_current={{status_current}}&redirect_url={{request.GET.redirect_url}}">
     {% csrf_token %}
-    {{ form.errors }}
+    {% if request.method == 'POST' %}
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+        <span>Не удалось отправить задание!</span>
+    </div>
+    {% endif %}
+    {% endif %}
     <div class="mb-3">
         <label for="InputRepo" class="form-label">{{ form.repo.label }}</label>
-        {{ form.repo }}
+        <div class="input-group mb-3">
+            {{ form.repo }}
+            {% if form.repo.value %}
+            <span class="input-group-text" id="basic-addon1">
+                <i class="bi bi-github"></i>&nbsp;
+                <a href="{{form.repo.value}}" target="_blank">
+                    Посмотреть на GitHub
+                </a>
+            </span>
+            {% endif %}
+        </div>
         <datalist id="repo_options">
-
         </datalist>
+
+        {% if request.method == 'POST' %}
+        {% if form.repo.errors %}
+        <div id="repoHelp" class="form-text text-danger">
+            {{ form.repo.errors }}
+        </div>
+        {% else %}
         <div id="repoHelp" class="form-text">
             Вставьте полный путь, например:
             <code>
                 https://github.com/{{request.user.github_account.extra_data.login}}/django_orm_challenges/pull/1
             </code>
         </div>
+        {% endif %}
+        {% endif %}
+
     </div>
     <div class="mb-3">
         <label for="InputComment" class="form-label">{{ form.comment.label }}</label>
         {{ form.comment }}
+        {% if request.method == 'POST' %}
         <div id="commentHelp" class="form-text">
             Напишите что-нибудь важное к выполнению, например, что бы хотели обсудить на созвоне 
             (это поле только для вас - куратор его не увидит)
         </div>
+        {% endif %}
         <div class="text-end mt-3">
-            
-            {% if object.status == 'execution' %}
+            {% if status.status == 'execution' %}
             <button type="submit" class="btn btn-danger btn-sm" name='status_sending' value="available" formnovalidate="TaskUpdateForm">Отменить выполнение</button>
             {% endif %}
             
             <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="{{status_sending}}" >
-                {% if object.status == 'execution' or object.status == 'available' or object.status == 'correction' %}
+                {% if status.status == 'execution' or status.status == 'available' or status.status == 'correction' %}
                 Отправить на проверку
                 {% else %}
                 Обновить комментарий

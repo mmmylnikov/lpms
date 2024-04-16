@@ -12,7 +12,7 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
             'first_name', 'last_name',
             )}),
         ('Учетная запись', {'fields': (
-            'username', 'gh_username', 'tg_username', 'email',
+            'username', 'gh_username', 'tg_username', 'email', 'notify',
             )}),
         ('Безопасность', {'fields': (
             'password',

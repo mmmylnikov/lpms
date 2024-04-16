@@ -1,0 +1,22 @@
+<!-- Modal User Update -->
+<div class="modal fade" id="modalUserNotify" tabindex="-1" aria-labelledby="modalUserUpdateLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Уведомления</h1>
+                <a href="{% url 'user_detail_view' request.user.username %}" 
+                   type="button" class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+                <div hx-get="{% url 'user_notify_status_view' request.user.username %}" hx-trigger="load" hx-swap="innerHTML">
+                    User Notify Status View</div>
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'user_detail_view' request.user.username %}" 
+                   type="button" class="btn btn-primary btn-sm">
+                   Вернуться в профиль
+                </a>
+        </div>
+        </div>
+    </div>
+</div>

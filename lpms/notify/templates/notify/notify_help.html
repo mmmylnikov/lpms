@@ -1,0 +1,62 @@
+{% if accounts.count == 0 %}
+
+<div class="alert alert-primary" role="alert">
+    Мы можем отправлять вам сообщения о проверенных работах в Telegram!
+</div>
+<div class="card">
+    <div class="card-header">
+      Как включить уведомления?
+    </div>
+    <ul class="list-group list-group-flush list-group-numbered">
+        <li class="list-group-item">
+            Проверьте, что у вас в профиле указан актуальный Telegram:
+            <a href="https://t.me/{{user.tg_username}}"><code>@{{user.tg_username}}</code></a>
+        </li>
+        <li class="list-group-item">
+            Напишите любое сообщение нашему боту
+            <a href="https://t.me/lpms_robot"><code>@lpms_robot</code></a>
+        </li>
+        <li class="list-group-item">
+            Бот ничего вам не ответит - это нормально! Он у нас не очень компанейский 😉
+        </li>
+        <li class="list-group-item">
+            Нажмете кнопку "проверить статус".
+        </li>
+        <li class="list-group-item">
+            Если бот вас признает, то будет присылать уведомления: 
+            в профиле у вас будет значок <i class="bi bi-bell-fill"></i>
+        </li>
+        <li class="list-group-item">
+            Если не удается подключить уведомления: 
+            напишите своему куратору - он поставит бота на место!
+        </li>
+    </ul>
+    <div class="card-body text-center">
+      <a href="{% url 'user_notify_switch_view' user.username %}" class="btn btn-success">Проверить статус</a>
+    </div>
+</div>
+
+{% else %}
+<div class="alert alert-primary" role="alert">
+    Похоже наш бот уже тебя знает!
+</div>
+<div class="card">
+    <div class="card-header">
+      Управление уведомлениями
+    </div>
+    <div class="card-body text-center">
+        {% if not user.notify %}
+        <a href="{% url 'user_notify_switch_view' user.username %}" 
+           class="btn btn-success">
+           Включить уведомления
+        </a>
+        {% else %}
+        <a href="{% url 'user_notify_switch_view' user.username %}" 
+           class="btn btn-danger">
+           Выключить уведомления
+        </a>
+        {% endif %}
+      
+    </div>
+</div>
+{% endif %}

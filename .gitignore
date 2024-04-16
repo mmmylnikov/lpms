@@ -160,3 +160,8 @@ cython_debug/
 #.idea/
 .DS_Store
 sandbox.ipynb
+sandbox.py
+lpms/shared/static/
+docker-compose.debug.yml
+lpms/db_test.json
+dev/

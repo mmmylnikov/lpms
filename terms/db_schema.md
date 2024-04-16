@@ -66,7 +66,7 @@
 ### Homework - Домашняя работа
 - id
 - user_id
-- сhallenge_id
+- challenge_id
 - github_url
 - status
 
