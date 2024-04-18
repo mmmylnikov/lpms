@@ -47,7 +47,7 @@ class GithubApi:
                             full_name_or_id: int | str) -> list[PullRequest]:
         self._connect()
         repo = self.api.get_repo(full_name_or_id=full_name_or_id)
-        pulls = list(repo.get_pulls())
+        pulls = list(repo.get_pulls(state='all'))
         self._rate_limiting()
         self._disconnect()
         return pulls

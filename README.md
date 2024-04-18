@@ -1,4 +1,4 @@
-<center><img src="demo/lpms-logo.png"></center>
+<center><img src="demo/logo-line-alfa.png"></center>
 <br>
 
 # Learn Python. Management system (LPMS)
@@ -32,6 +32,7 @@ LPMS - Это система управления обучением для ку
 - Скриншоты интерфейса
   - [Авторизация и профили](https://mmmylnikov.github.io/lpms-docs/screenshots/auth/)
   - [Процесс обучения](https://mmmylnikov.github.io/lpms-docs/screenshots/learn/)
+  - [Уведомления](https://mmmylnikov.github.io/lpms-docs/screenshots/notify/)
 - Журнал разработки
   - [Задачи](https://mmmylnikov.github.io/lpms-docs/devlog/todo/)
   - [История версий](https://mmmylnikov.github.io/lpms-docs/devlog/log/)

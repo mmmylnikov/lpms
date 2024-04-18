@@ -336,26 +336,22 @@ class PullAutocompleteView(LoginRequiredMixin, TemplateView):
             repos = Repo.objects.filter(full_name__icontains=repo_name)
             pulls = Pull.objects.filter(
                 html_url__icontains=repo_name).select_related('repo')
-        repos_all = Repo.objects.filter(user=self.request.user)
-        pulls_all = Pull.objects.filter(repo__user=self.request.user)
         repos_count = repos.count()
-        if repos_count > 1:
-            context.update({
-                'repos': repos,
-                'pulls': pulls,
-                })
-        elif repos_count == 1:
-            repo = repos[0]
-            pulls = Pull.objects.filter(repo=repo)
-            if pulls.count() == 0:
-                pulls = repo.update_pulls()
-            context.update({
-                'pulls': pulls,
-                'repos': repos,
-            })
+        if repos_count > 3:
+            context.update({'repos': repos, 'pulls': pulls, })
+        elif repos_count >= 1 and repos_count <= 3:
+            for repo in repos:
+                pulls = Pull.objects.filter(repo=repo)
+                if pulls.count() == 0:
+                    pulls = repo.update_pulls()
+            pulls = Pull.objects.filter(repo__in=repos)
+            context.update({'pulls': pulls, 'repos': repos, })
         else:
-            context.update({
-                'repos': repos_all,
-                'pulls': pulls_all,
-                })
+            repos_all = Repo.objects.filter(user=self.request.user)
+            if repos_all.count() == 0:
+                repos = self.request.user.update_repos()
+                context.update({'repos': repos, })
+                return context
+            pulls_all = Pull.objects.filter(repo__user=self.request.user)
+            context.update({'repos': repos_all, 'pulls': pulls_all, })
         return context
