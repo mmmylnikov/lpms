@@ -14,7 +14,6 @@ SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 
 DEBUG = getenv("DEBUG", 'False').lower() in ('true', '1')
 
-
 ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 
 CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
