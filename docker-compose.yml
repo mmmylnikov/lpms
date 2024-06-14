@@ -6,7 +6,7 @@ services:
     image: postgres
     ports:
       - 5432:5432
-    restart: always
+    restart: unless-stopped
     shm_size: 128mb
     volumes:
       - lpms_db:/var/lib/postgresql/data
@@ -17,11 +17,11 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
   app:
     build: ./lpms
     restart: always
@@ -43,7 +43,7 @@ services:
     image: nginx:latest
     restart: always
     ports:
-      - 80:80
+      - 8080:80
     depends_on:
       - app
     volumes:
