@@ -1,3 +1,8 @@
+# css/js/icons
+*bootstrap*
+htmx.min.js
+lpms/static/icons/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
