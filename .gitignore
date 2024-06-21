@@ -3,6 +3,7 @@
 htmx.min.js
 lpms/static/icons/
 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -167,6 +168,7 @@ cython_debug/
 sandbox.ipynb
 sandbox.py
 lpms/shared/static/
+lpms/shared/media/
 docker-compose.debug.yml
 lpms/db_test.json
 dev/

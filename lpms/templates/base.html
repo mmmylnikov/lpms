@@ -11,7 +11,12 @@
         {% block head_title %}
         {% endblock %}
     </title>
-    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png'%}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png'%}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png'%}">
+    <link rel="manifest" href="{% static 'favicons/site.webmanifest'%}">
+    <!-- CSS -->
     <link href="{% static '/css/bootstrap.min.css' %} " rel="stylesheet">
     <style>
         .list-group-item.active {
@@ -44,6 +49,8 @@
 
 
     </main>
+    <!-- JS -->
+    <script src="{% static 'js/htmx.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script>
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
