@@ -1,5 +1,7 @@
 {% load socialaccount %}
 
+{% load static %}
+
 {% block header %}
 <header class="py-1 mb-3 border-bottom bg-body-tertiary">
     <div class="container-fluid ">
@@ -24,7 +26,13 @@
                 <div class="flex-shrink-0 dropdown">
                     <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="{{ learn_meta.user_github.extra_data.avatar_url}}" alt="mdo" width="32" height="32"
+                        <img 
+                        {% if learn_meta.user_github %}
+                        src="{{ learn_meta.user_github.extra_data.avatar_url}}" 
+                        {% else %}
+                        src="{% static 'placeholders/user2.png' %}" 
+                        {% endif %}
+                        alt="mdo" width="32" height="32"
                             class="rounded-circle border">
                     </a>
                     <ul class="dropdown-menu text-small shadow">

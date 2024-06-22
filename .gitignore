@@ -2,7 +2,7 @@
 *bootstrap*
 htmx.min.js
 lpms/static/icons/
-
+lpms/static/placeholders/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from markdown import markdown
 
@@ -5,7 +6,7 @@ from course.models import Course
 from learn.meta import LearnMeta
 
 
-class CourseDetailView(TemplateView):
+class CourseDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'course/course_detail.html'
 
     def get_context_data(self, **kwargs: dict) -> dict:
