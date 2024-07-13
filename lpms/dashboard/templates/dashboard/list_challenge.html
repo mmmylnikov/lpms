@@ -10,46 +10,47 @@
             <div class="card-header">
               Задания
             </div>
-            <div class="card-body">
-                <div class="row">
-                    {% for challenge, task, status in homework %}
-                    <div class="col-sm-12 mb-3 mb-sm-1">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h5 class="card-title">{{ challenge.name }}</h5>
-                                    <span>
-                                        
-                                        {% if challenge.repo or challenge.url %}
-                                        <div class="btn-group" role="group">
-                                            {% if challenge.repo %}
-                                            <a href="{{challenge.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
-                                            {% endif %}
-                                            {% if challenge.url %}
+            <div class="accordion accordion-flush pb-1" id="accordionFlushChallenges{{ track.pk }}">
+                {% for challenge, task, status in homework %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                  data-bs-target="#flush-collapse-{{ challenge.pk}}" aria-expanded="false" 
+                                  aria-controls="flush-collapse-{{ challenge.pk}}">
+                                  {{ challenge.name }}
+                          </button>
+                        </h2>
+                        <div id="flush-collapse-{{ challenge.pk}}" class="accordion-collapse collapse" 
+                             data-bs-parent="#accordionFlushChallenges{{ track.pk }}">
+                          <div class="accordion-body">
+                                <span>
                                             
-                                            {% endif %}
-                                        </div>
+                                    {% if challenge.repo or challenge.url %}
+                                    <div class="btn-group" role="group">
+                                        {% if challenge.repo %}
+                                        <a href="{{challenge.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
                                         {% endif %}
-                                        {% if not learn_meta.tutor == request.user %}
-                                        <a href="{% url 'student_task_view' week_number learn_meta.team.slug challenge.pk %}" class="btn btn-success btn-sm">
-                                            <i class="bi bi-laptop"></i>
-                                            выполнить
-                                        </a>
+                                        {% if challenge.url %}
+                                        <a href="{{challenge.url}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-link"></i> ссылка</a>
                                         {% endif %}
-                                    </span>
-                                </div>
-                                
+                                    </div>
+                                    {% endif %}
+                                    {% if not learn_meta.tutor == request.user %}
+                                    <a href="{% url 'student_task_view' week_number learn_meta.team.slug challenge.pk %}" class="btn btn-success btn-sm">
+                                        <i class="bi bi-laptop"></i>
+                                        выполнить
+                                    </a>
+                                    {% endif %}
+                                </span>
                                 {% if challenge.content %}
-                                <p class="card-text">{{challenge.content_markdown|safe}}</p>
+                                <hr>
+                                {{challenge.content_markdown|safe}}
                                 {% endif %}
-                            </div>
+                          </div>
                         </div>
                     </div>
-                    
-                    {% endfor %}
-                </div>
+                {% endfor %}
             </div>
-          </div>
         {% endif %}
     {% endif %}
 {% endfor %}

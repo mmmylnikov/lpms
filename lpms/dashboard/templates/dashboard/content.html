@@ -1,23 +1,17 @@
 {% if content_type == 'video' %}
 
-<div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">{{ obj.name }}</h5>
-        </div>
-        <div class="modal-body">
-            <div>
-                <iframe height="100%" width="100%" src="https://www.youtube.com/embed/{{video_uid}}" 
-                        frameborder="0" style="min-height: 360px;"
-                    allowfullscreen>
-                </iframe>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
-        </div>
-    </div>
+<div id="youtube_player">
+    <hr>
+    <iframe height="100%" width="100%" 
+    src="https://www.youtube.com/embed/{{video_uid}}?rel=0&hd=1&showinfo=0&enablejsapi=1" 
+    style="min-height: 360px;"
+     class="yt_player_iframe" 
+    allowfullscreen="true" allowscriptaccess="always" frameborder="0">
+    </iframe>
 </div>
+
+
+
 
 {% else %}
 <div class="modal-dialog modal-dialog-centered">
