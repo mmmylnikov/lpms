@@ -8,6 +8,8 @@ from user.models import User
 class Course(models.Model):
     name = models.CharField(max_length=128, verbose_name='Название')
     description = models.TextField(verbose_name='Описание')
+    tg_chat = models.CharField(max_length=256, verbose_name='Телеграм чат',
+                               blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -34,6 +36,8 @@ class Enrollment(models.Model):
     number = models.PositiveSmallIntegerField(verbose_name='Номер')
     start = models.DateField(verbose_name='Старт')
     finish = models.DateField(verbose_name='Финиш')
+    tg_chat = models.CharField(max_length=256, verbose_name='Телеграм чат',
+                               blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -59,6 +63,8 @@ class Team(models.Model):
                               verbose_name='Куратор', related_name='tutor')
     students = models.ManyToManyField(User, verbose_name='Студенты',
                                       blank=True)
+    tg_chat = models.CharField(max_length=256, verbose_name='Телеграм чат',
+                               blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 

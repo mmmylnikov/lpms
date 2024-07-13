@@ -7,8 +7,14 @@ from django.contrib.auth.models import AnonymousUser
 
 from user.models import User
 from course.models import Team, Enrollment, Course, Track
-from learn.models import (Program, Week, Lesson, Challenge,
-                          Homework, HomeworkStatus)
+from learn.models import (
+    Program,
+    Week,
+    Lesson,
+    Challenge,
+    Homework,
+    HomeworkStatus,
+)
 from learn.enums import HomeworkStatuses
 
 
@@ -20,27 +26,30 @@ class LearnMeta:
     tasks_learn: QuerySet[Homework] | None
     tasks_status_learn: QuerySet[HomeworkStatus] | None
     account_fullness_errors: list[str]
+    support_links: list[tuple[str, str]]
 
     def __init__(self, user: User | AnonymousUser) -> None:
         self.user = user
         self.get_user_github_account()
 
     def get_teams_learn(self) -> QuerySet[Team] | None:
-        """ Return teams where the user is a student """
+        """Return teams where the user is a student"""
         if isinstance(self.user, AnonymousUser):
             return None
         self.teams_learn = self.user.team_set.all().select_related(
-            'tutor', 'enrollment', 'enrollment__course')
+            "tutor", "enrollment", "enrollment__course"
+        )
         return self.teams_learn
 
     def get_teams_review(self) -> QuerySet[Team] | None:
-        """ Return teams where the user is a tutor """
+        """Return teams where the user is a tutor"""
         if isinstance(self.user, AnonymousUser):
             return None
-        self.teams_review = Team.objects.filter(
-            tutor=self.user).select_related(
-            'tutor', 'enrollment', 'enrollment__course'
-            ).prefetch_related('students')
+        self.teams_review = (
+            Team.objects.filter(tutor=self.user)
+            .select_related("tutor", "enrollment", "enrollment__course")
+            .prefetch_related("students")
+        )
         return self.teams_review
 
     def get_teams(self) -> Self:
@@ -53,18 +62,30 @@ class LearnMeta:
             return self
         tasks_learn = Homework.objects.filter(user=self.user)
         if not only_at_work:
-            tasks_learn = tasks_learn.exclude(status__in=[
-                HomeworkStatuses.approved.name,
-                HomeworkStatuses.available.name])
+            tasks_learn = tasks_learn.exclude(
+                status__in=[
+                    HomeworkStatuses.approved.name,
+                    HomeworkStatuses.available.name,
+                ]
+            )
         self.tasks_learn = tasks_learn.select_related(
-                    'challenge', 'challenge__track', 'week',
-                    'team', 'team__enrollment', 'team__enrollment__course')
+            "challenge",
+            "challenge__track",
+            "week",
+            "team",
+            "team__enrollment",
+            "team__enrollment__course",
+        )
         self.tasks_status_learn = HomeworkStatus.objects.filter(
-            homework__in=self.tasks_learn).select_related(
-                'homework', 'homework__challenge',
-                'homework__week',
-                'homework__team', 'homework__team__enrollment',
-                'homework__team__enrollment__course', )
+            homework__in=self.tasks_learn
+        ).select_related(
+            "homework",
+            "homework__challenge",
+            "homework__week",
+            "homework__team",
+            "homework__team__enrollment",
+            "homework__team__enrollment__course",
+        )
         return self
 
     def get_tasks_status_latest(self) -> list[HomeworkStatus] | None:
@@ -85,25 +106,48 @@ class LearnMeta:
         if isinstance(self.user, AnonymousUser):
             return self
         accounts = {}  # type: ignore
-        for account in self.user.socialaccount_set.all(  # type: ignore
-                ).iterator():
+        for (
+            account
+        ) in self.user.socialaccount_set.all().iterator():  # type: ignore
             providers = accounts.setdefault(account.provider, [])
             providers.append(account)
-        if accounts.get('github'):
-            self.user_github = accounts['github'][0]
+        if accounts.get("github"):
+            self.user_github = accounts["github"][0]
         return self
 
     def check_account_fullness(self) -> Self:
         if isinstance(self.user, AnonymousUser):
             return self
         errors = []
-        if self.user.first_name == '' or self.user.last_name == '':
-            errors.append('Заполните имя и фамилию')
+        if self.user.first_name == "" or self.user.last_name == "":
+            errors.append("Заполните имя и фамилию")
         if self.user.tg_username is None:
-            errors.append('Укажите ник в Telegram')
-        if not hasattr(self, 'user_github'):
-            errors.append('Привяжите GitHub аккаунт')
+            errors.append("Укажите ник в Telegram")
+        if not hasattr(self, "user_github"):
+            errors.append("Привяжите GitHub аккаунт")
         self.account_fullness_errors = errors
+        return self
+
+    def get_support_links(
+        self,
+        course: Course | None = None,
+        enrollment: Enrollment | None = None,
+        team: Team | None = None,
+    ) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        support_links = []
+        if course and course.tg_chat:
+            support_links.append((course.tg_chat, f"Чат курса {course.name}"))
+        if enrollment and enrollment.tg_chat:
+            support_links.append(
+                (enrollment.tg_chat, f"Чат потока {enrollment.slug}")
+            )
+        if team and team.tg_chat:
+            support_links.append(
+                (team.tg_chat, f"Чат группы (куратор {team.tutor.first_name})")
+            )
+        self.support_links = support_links
         return self
 
 
@@ -123,16 +167,17 @@ class StudentLearnMeta(LearnMeta):
     week_number: int
     week_tracks: QuerySet[Track]
     week_lessons: dict[Track, list[Lesson]]
-    week_challenges: dict[Track,
-                          list[tuple[Challenge,
-                                     Homework | None,
-                                     HomeworkStatus | None]]
-                          ] | None = None
+    week_challenges: (
+        dict[
+            Track,
+            list[tuple[Challenge, Homework | None, HomeworkStatus | None]],
+        ]
+        | None
+    ) = None
 
-    def __init__(self,
-                 user: User | AnonymousUser,
-                 team: Team,
-                 week_number: int) -> None:
+    def __init__(
+        self, user: User | AnonymousUser, team: Team, week_number: int
+    ) -> None:
         super().__init__(user)
         self.init_course_meta(team=team)
         self.init_learn_meta(week_number=week_number)
@@ -147,8 +192,11 @@ class StudentLearnMeta(LearnMeta):
     def init_learn_meta(self, week_number: int) -> None:
         self.week_number = week_number
 
-        self.program = Program.objects.filter(
-            enrollments__in=[self.enrollment]).prefetch_related('weeks').last()
+        self.program = (
+            Program.objects.filter(enrollments__in=[self.enrollment])
+            .prefetch_related("weeks")
+            .last()
+        )
         if not self.program:
             return
 
@@ -165,9 +213,11 @@ class StudentLearnMeta(LearnMeta):
 
     def get_current_week(self) -> None:
         self.week_current_number = (
-            date.today() - self.enrollment.start).days // 7 + 1
+            date.today() - self.enrollment.start
+        ).days // 7 + 1
         self.week_current = self.weeks.filter(
-            number=self.week_current_number).last()
+            number=self.week_current_number
+        ).last()
         if not self.week_number and self.week_current:
             self.week_number = self.week_current_number
             self.week = self.week_current
@@ -175,13 +225,14 @@ class StudentLearnMeta(LearnMeta):
             self.week = self.weeks.get(number=self.week_number)
 
     def get_lessons_from_week(self) -> None:
-        lessons = list(self.week.lessons.all().select_related('track'))
-        self.week_lessons = {track: [
-            lesson for lesson in lessons if lesson.track == track
-            ] for track in self.tracks}  # type: ignore
+        lessons = list(self.week.lessons.all().select_related("track"))
+        self.week_lessons = {
+            track: [lesson for lesson in lessons if lesson.track == track]
+            for track in self.tracks
+        }  # type: ignore
 
     def get_challenges_from_week(self) -> None:
-        challenges = list(self.week.challenges.all().select_related('track'))
+        challenges = list(self.week.challenges.all().select_related("track"))
         week_challenges = dict()
         if not self.tracks:
             self.week_challenges = None
@@ -192,9 +243,11 @@ class StudentLearnMeta(LearnMeta):
                 if challenge.track != track:
                     continue
                 week_homework.append((challenge, None, None))
-            week_challenges.update({
-                track: week_homework,
-            })
+            week_challenges.update(
+                {
+                    track: week_homework,
+                }
+            )
         self.week_challenges = week_challenges  # type: ignore
 
     def add_task_for_week_challenges(self) -> Self:
@@ -214,18 +267,23 @@ class StudentLearnMeta(LearnMeta):
                 task = None
                 task_status = None
                 week_tasks = [
-                    task for task in tasks if task.challenge == challenge]
+                    task for task in tasks if task.challenge == challenge
+                ]
                 if week_tasks:
                     task = week_tasks[0]
                     task_statuses = [
-                        status for status in tasks_status if status
-                        .homework == task]
+                        status
+                        for status in tasks_status
+                        if status.homework == task
+                    ]
                     if task_statuses:
                         task_status = task_statuses[0]
                 week_homework.append((challenge, task, task_status))
-            week_challenges.update({
-                track: week_homework,
-            })
+            week_challenges.update(
+                {
+                    track: week_homework,
+                }
+            )
         self.week_challenges = week_challenges
         return self
 
@@ -233,36 +291,51 @@ class StudentLearnMeta(LearnMeta):
 class TutorLearnMeta(StudentLearnMeta):
     # review
     students: dict[User, SocialAccount]
-    week_reviews: dict[User, list[tuple[Homework | None,
-                                        HomeworkStatus | None]]] | None = None
+    week_reviews: (
+        dict[User, list[tuple[Homework | None, HomeworkStatus | None]]] | None
+    ) = None
 
-    def __init__(self,
-                 user: User | AnonymousUser,
-                 team: Team, week_number: int) -> None:
+    def __init__(
+        self, user: User | AnonymousUser, team: Team, week_number: int
+    ) -> None:
         super().__init__(user, team, week_number)
         self.get_students()
         self.get_week_reviews()
 
     def get_students(self) -> None:
         accounts = SocialAccount.objects.filter(
-            user__in=list(self.team.students.all())).select_related('user')
+            user__in=list(self.team.students.all())
+        ).select_related("user")
         self.students = {account.user: account for account in accounts}
 
     def get_week_reviews(self) -> None:
         if isinstance(self.user, AnonymousUser):
             return None
         reviews = Homework.objects.filter(
-            week=self.week, team=self.team,
-            ).select_related('user', 'challenge', )
-        week_reviews: dict[User, list[tuple[Homework | None,
-                                            HomeworkStatus | None]]] = dict()
-        review_statuses = list(HomeworkStatus.objects.filter(
-            tutor=self.user).select_related('student', 'tutor', 'homework'))
+            week=self.week,
+            team=self.team,
+        ).select_related(
+            "user",
+            "challenge",
+        )
+        week_reviews: dict[
+            User, list[tuple[Homework | None, HomeworkStatus | None]]
+        ] = dict()
+        review_statuses = list(
+            HomeworkStatus.objects.filter(tutor=self.user).select_related(
+                "student", "tutor", "homework"
+            )
+        )
         for review in reviews:
             if not week_reviews.get(review.user):
                 week_reviews[review.user] = []
-            student_review_status = [status for status in review_statuses if (
-                status.student == review.user and status.homework == review)]
+            student_review_status = [
+                status
+                for status in review_statuses
+                if (
+                    status.student == review.user and status.homework == review
+                )
+            ]
             if not student_review_status:
                 continue
             review_status = student_review_status[0]
