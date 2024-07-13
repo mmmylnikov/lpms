@@ -23,7 +23,7 @@
                         </h2>
                         <div id="flush-collapse-{{lesson.pk}}" class="accordion-collapse collapse" 
                              data-bs-parent="#accordionFlushLessons{{ track.pk }}">
-                          <div class="accordion-body">
+                            <div class="accordion-body">
                                 <div class="btn-group" role="group">
                                     {% if lesson.video %}
                                     <button hx-get="{% url 'get_dashboard_content' 'lesson' lesson.pk 'video' %}" 
@@ -52,7 +52,7 @@
                                 <hr>
                                 {{lesson.content}}
                                 {% endif %}
-                          </div>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
