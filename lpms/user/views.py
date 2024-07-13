@@ -19,12 +19,16 @@ class UserDetailView(DetailView):
     model = User
 
     def get_slug_field(self) -> str:
-        return 'username'
+        return "username"
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
-        context["learn_meta"] = LearnMeta(
-            user=self.get_object()).get_teams().get_tasks_learn()
+        context["learn_meta"] = (
+            LearnMeta(user=self.get_object())
+            .get_teams()
+            .get_tasks_learn()
+            .check_account_fullness()
+        )
         return context
 
 
@@ -33,20 +37,21 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserUpdateForm
 
     def get_success_url(self) -> str:
-        return reverse_lazy('user_detail_view',
-                            kwargs={'slug': self.request.user.username})
+        return reverse_lazy(
+            "user_detail_view", kwargs={"slug": self.request.user.username}
+        )
 
     def get_slug_field(self) -> str:
-        return 'username'
+        return "username"
 
 
 class UserNotifySwitchView(LoginRequiredMixin, TemplateView):
-    template_name = 'user/user_notify_switch.html'
+    template_name = "user/user_notify_switch.html"
 
-    def render_to_response(self,
-                           context: dict[str, Any],
-                           **response_kwargs: Any) -> HttpResponse:
-        return redirect('user_detail_view', slug=self.request.user.username)
+    def render_to_response(
+        self, context: dict[str, Any], **response_kwargs: Any
+    ) -> HttpResponse:
+        return redirect("user_detail_view", slug=self.request.user.username)
         # return super().render_to_response(context, **response_kwargs)
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
@@ -54,17 +59,17 @@ class UserNotifySwitchView(LoginRequiredMixin, TemplateView):
         if isinstance(self.request.user, AnonymousUser):
             return context
         notify_html = switch_notify(user=self.request.user)
-        context.update({'notify_html': notify_html})
+        context.update({"notify_html": notify_html})
         return context
 
 
 class UserNotifyStatusView(LoginRequiredMixin, TemplateView):
-    template_name = 'user/user_notify_status.html'
+    template_name = "user/user_notify_status.html"
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         if isinstance(self.request.user, AnonymousUser):
             return context
         notify_html = get_notify_status(user=self.request.user)
-        context.update({'notify_html': notify_html})
+        context.update({"notify_html": notify_html})
         return context

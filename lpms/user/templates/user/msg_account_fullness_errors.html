@@ -1,0 +1,26 @@
+{% if learn_meta.account_fullness_errors %}
+<div class="container-fluid pb-3">
+    <div class="d-grid gap-3" style="grid-template-columns: 1fr;">
+        <div class="bg-body-tertiary border rounded-3 p-3 pb-0">
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-primary pb-0" role="alert">
+                        <h5>Привет 👋 Перед началом обучения тебе необходимо заполнить 
+                            <a class="" href="{% url 'user_detail_view' request.user.username %}"> профиль</a>.
+                        </h5>
+                        <ul>
+                            {% if learn_meta.account_fullness_errors.0 != 'Привяжите GitHub аккаунт' %}
+                            <li>Перейди в раздел "<a class="" href="{% url 'user_detail_view' request.user.username %}">Мой профиль</a>"</li>
+                            <li>Нажми кнопку "Редактировать профиль"</li>
+                            {% endif %}
+                            {% for error in learn_meta.account_fullness_errors %}
+                            <li>{{error}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

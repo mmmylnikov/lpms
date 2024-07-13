@@ -26,7 +26,7 @@ class CourseDetailView(LoginRequiredMixin, TemplateView):
 
         if self.request.user.is_authenticated:
             context['learn_meta'] = LearnMeta(
-                user=self.request.user).get_teams()
+                user=self.request.user).get_teams().check_account_fullness()
         return context
 
     def get_object(self) -> Course | None:

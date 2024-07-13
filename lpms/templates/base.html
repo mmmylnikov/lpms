@@ -32,6 +32,9 @@
     <main>
         {% include 'header.html' %}
         
+        {% block messages %}
+        {% endblock %}
+        
         <div class="container-fluid pb-3">
             {% block dashboard %}
             <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">

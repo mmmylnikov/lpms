@@ -19,6 +19,7 @@ class LearnMeta:
     teams_review: QuerySet[Team] | None
     tasks_learn: QuerySet[Homework] | None
     tasks_status_learn: QuerySet[HomeworkStatus] | None
+    account_fullness_errors: list[str]
 
     def __init__(self, user: User | AnonymousUser) -> None:
         self.user = user
@@ -90,6 +91,19 @@ class LearnMeta:
             providers.append(account)
         if accounts.get('github'):
             self.user_github = accounts['github'][0]
+        return self
+
+    def check_account_fullness(self) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        errors = []
+        if self.user.first_name == '' or self.user.last_name == '':
+            errors.append('Заполните имя и фамилию')
+        if self.user.tg_username is None:
+            errors.append('Укажите ник в Telegram')
+        if not hasattr(self, 'user_github'):
+            errors.append('Привяжите GitHub аккаунт')
+        self.account_fullness_errors = errors
         return self
 
 
