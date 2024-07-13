@@ -30,6 +30,7 @@ class Lesson(models.Model):
                             verbose_name='Репозиторий')
     url = models.CharField(max_length=512, null=True, blank=True,
                            verbose_name='Ссылка')
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок', default=0)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -61,12 +62,12 @@ class Lesson(models.Model):
         return ', '.join(output)
 
     def __str__(self) -> str:
-        return f'{self.track} - {self.name}'
+        return f'{self.track} - {self.name} ({self.order})'
 
     class Meta:
         verbose_name = 'Урок'
         verbose_name_plural = 'Уроки'
-        ordering = ('track', 'created_at', 'name', )
+        ordering = ('track', 'order', 'name', )
         get_latest_by = 'created_at'
 
 
@@ -79,6 +80,7 @@ class Challenge(models.Model):
                             verbose_name='Репозиторий')
     url = models.CharField(max_length=512, null=True, blank=True,
                            verbose_name='Ссылка')
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок', default=0)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -99,12 +101,12 @@ class Challenge(models.Model):
         return ', '.join(output)
 
     def __str__(self) -> str:
-        return f'{self.track} - {self.name}'
+        return f'{self.track} - {self.name} ({self.order})'
 
     class Meta:
         verbose_name = 'Задание'
         verbose_name_plural = 'Задания'
-        ordering = ('track', 'created_at', 'name', )
+        ordering = ('track', 'order', 'name', )
         get_latest_by = 'created_at'
 
 

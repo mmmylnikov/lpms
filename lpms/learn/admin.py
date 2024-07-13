@@ -21,18 +21,20 @@ class AddedFieldAdminMixin:
 
 class LessonAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
                   admin.ModelAdmin):
-    list_display = ('track', 'name', 'added')
+    list_display = ('track', 'order', 'name', 'added', )
     list_display_links = ('name',)
+    list_editable = ('order', )
     list_filter = ('track', 'track__course', )
-    ordering = ('track', 'created_at',)
+    ordering = ('track', 'order', 'name')
 
 
 class ChallengeAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
                      admin.ModelAdmin):
-    list_display = ('track', 'name', 'added')
+    list_display = ('track', 'order', 'name', 'added')
     list_display_links = ('name',)
+    list_editable = ('order', )
     list_filter = ('track', 'track__course', )
-    ordering = ('track', 'created_at',)
+    ordering = ('track', 'order', 'name')
 
 
 class HomeworkAdmin(ImportExportModelAdmin, admin.ModelAdmin):
