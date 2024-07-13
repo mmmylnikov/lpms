@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 
 
 from course.models import Team
@@ -71,6 +71,18 @@ class StudentDashboardView(DashboardView):
                 }
             )
         return context
+
+    def get(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse | HttpResponseNotFound:
+        context = self.get_context_data(**kwargs)
+        if hasattr(context["learn_meta"], "week_current_number"):
+            if (
+                context["learn_meta"].week_current_number
+                < context["week"].number
+            ):
+                return HttpResponseNotFound()
+        return self.render_to_response(context)
 
 
 class TutorDashboardView(DashboardView):
