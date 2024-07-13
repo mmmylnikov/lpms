@@ -16,8 +16,9 @@
         <p class="card-text">
             <div hx-get="{% url 'task_update_view' task.pk%}?status_sending={{status_sending}}&status_current={{status.status}}&redirect_url={{request.META.HTTP_REFERER}}" 
                  hx-trigger="load" hx-swap="innerHTML">
-                Task
-                Update Form
+                 <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
             </div>
         </p>                
     </div>

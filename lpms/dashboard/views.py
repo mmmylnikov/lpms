@@ -394,11 +394,17 @@ class PullAutocompleteView(LoginRequiredMixin, TemplateView):
             return context
         repo_name = self.request.GET.get("repo")
         if not repo_name:
-            repos = Repo.objects.all()
-            pulls = Pull.objects.all().select_related("repo")
-        else:
-            repos = Repo.objects.filter(full_name__icontains=repo_name)
+            repos = Repo.objects.filter(user=self.request.user)
             pulls = Pull.objects.filter(
+                repo__user=self.request.user
+            ).select_related("repo")
+        else:
+            repos = Repo.objects.filter(
+                user=self.request.user,
+                full_name__icontains=repo_name
+                )
+            pulls = Pull.objects.filter(
+                repo__user=self.request.user,
                 html_url__icontains=repo_name
             ).select_related("repo")
         repos_count = repos.count()
@@ -411,10 +417,16 @@ class PullAutocompleteView(LoginRequiredMixin, TemplateView):
             )
         elif repos_count >= 1 and repos_count <= 3:
             for repo in repos:
-                pulls = Pull.objects.filter(repo=repo)
+                pulls = Pull.objects.filter(
+                    repo__user=self.request.user,
+                    repo=repo
+                    )
                 if pulls.count() == 0:
                     pulls = repo.update_pulls()
-            pulls = Pull.objects.filter(repo__in=repos)
+            pulls = Pull.objects.filter(
+                repo__user=self.request.user,
+                repo__in=repos
+                )
             context.update(
                 {
                     "pulls": pulls,
