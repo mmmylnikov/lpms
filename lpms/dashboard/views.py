@@ -120,6 +120,7 @@ class ContentView(LoginRequiredMixin, TemplateView):
 
     class ContentTypeMapper(Enum):
         video = "video"
+        slide = "slide"
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
@@ -132,6 +133,8 @@ class ContentView(LoginRequiredMixin, TemplateView):
 
         if content_type == "video":
             context["video_uid"] = obj.video_uid
+        elif content_type == "slide":
+            context["slide_url"] = obj.slide_embed_url
 
         context.update(
             {

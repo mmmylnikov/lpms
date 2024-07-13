@@ -17,7 +17,7 @@
                           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                   data-bs-target="#flush-collapse-{{ lesson.pk}}" aria-expanded="false" 
                                   aria-controls="flush-collapse-{{ lesson.pk}}"
-                                  onclick="youtube_player_stop()">
+                                  onclick="players_stop()">
                                   {{ lesson.name }}
                           </button>
                         </h2>
@@ -32,7 +32,10 @@
                                             class="btn btn-danger btn-sm"><i class="bi bi-youtube"></i> видео</button>
                                     {% endif %}
                                     {% if lesson.slide %}
-                                    <a href="{{lesson.slide}}" target="_blank" class="btn btn-warning btn-sm"><i class="bi bi-file-easel"></i> слайды</a>
+                                    <button hx-get="{% url 'get_dashboard_content' 'lesson' lesson.pk 'slide' %}" 
+                                            hx-target="#player-lesson-{{lesson.pk}}-slide" 
+                                            hx-trigger="click" 
+                                            class="btn btn-warning btn-sm"><i class="bi bi-file-easel"></i></i> слайды</button>
                                     {% endif %}
                                     {% if lesson.repo %}
                                     <a href="{{lesson.repo}}" target="_blank" class="btn btn-secondary btn-sm"><i class="bi bi-github"></i> github</a>
@@ -42,7 +45,8 @@
                                     {% endif %}
                                 </div>
                                 <div id="player-lesson-{{lesson.pk}}-video">
-
+                                </div>
+                                <div id="player-lesson-{{lesson.pk}}-slide">
                                 </div>
                                 {% if lesson.content %}
                                 <hr>
@@ -59,10 +63,18 @@
 {% endfor %}
 
 <script>
-    function youtube_player_stop() {
-        ytplayer = document.getElementById("youtube_player");
-        if (ytplayer) {
-            ytplayer.remove();
+    function players_stop() {
+        youtube_player = document.getElementById("youtube_player");
+        if (youtube_player) {
+            youtube_player.remove();
+        }
+        slide_player = document.getElementById("slide_player");
+        if (slide_player) {
+            slide_player.remove();
+        }
+        error_player = document.getElementById("error_player");
+        if (error_player) {
+            error_player.remove();
         }
     }
 </script>

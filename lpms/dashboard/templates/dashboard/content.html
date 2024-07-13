@@ -1,5 +1,4 @@
 {% if content_type == 'video' %}
-
 <div id="youtube_player">
     <hr>
     <iframe height="100%" width="100%" 
@@ -9,25 +8,19 @@
     allowfullscreen="true" allowscriptaccess="always" frameborder="0">
     </iframe>
 </div>
-
-
-
-
+{% elif content_type == 'slide' %}
+<div id="slide_player">
+    <hr>
+    <iframe src="{{slide_url}}" 
+            frameborder="0"  height="480px" width="100%"
+            allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+</div>
 {% else %}
-<div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Ошибка загрузки</h5>
-        </div>
-        <div class="modal-body">
-            <div class="alert alert-warning" role="alert">
-                К сожалению не удалось загрузить контент
-              </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Закрыть</button>
-        </div>
-    </div>
+<div id="error_player">
+    <hr>
+    <div class="alert alert-warning" role="alert">
+        К сожалению не удалось загрузить контент
+      </div>
 </div>
 {% endif %}
 

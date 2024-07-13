@@ -40,6 +40,12 @@ class Lesson(models.Model):
         return self.video.replace('https://www.youtube.com/watch?v=', '')
 
     @property
+    def slide_embed_url(self) -> str | None:
+        if not self.slide:
+            return None
+        return self.slide.replace('/pub?', '/embed?')
+
+    @property
     def added(self) -> str:
         output = []
         if self.content:
