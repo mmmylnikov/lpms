@@ -129,6 +129,24 @@ class TutorDashboardStatsView(LoginRequiredMixin, TemplateView):
         return context
 
 
+class AdminDashboardStatsView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/admin_stats.html"
+    status: HomeworkStatuses = HomeworkStatuses.review
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+
+        learn_meta = (
+            LearnMeta(user=self.request.user)
+            .get_teams()
+            .get_admin_stats(status=self.status)
+        )
+        context.update({
+            "learn_meta": learn_meta,
+            "homework_status": self.status})
+        return context
+
+
 class ContentView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/content.html"
 

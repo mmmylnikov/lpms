@@ -201,6 +201,34 @@ class LearnMeta:
         )
         return self
 
+    def get_admin_stats(self, status: HomeworkStatuses) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        tutors = User.objects.filter(is_tutor=True).order_by(
+            "last_name", "first_name"
+        )
+        admin_stats = {}
+        for tutor in tutors:
+            homework_status_ids = self.get_homework_status_ids(
+                tutor_id=tutor.pk, status=status
+            )
+            tutor_stat = (
+                HomeworkStatus.objects.filter(
+                    id__in=homework_status_ids,
+                    status=status.name,
+                )
+                .select_related(
+                    "student",
+                    "homework__challenge",
+                    "homework__team__enrollment__course",
+                    "homework__week",
+                )
+                .order_by("updated_at")
+            )
+            admin_stats[tutor] = tutor_stat
+        self.admin_stats = admin_stats
+        return self
+
 
 class StudentLearnMeta(LearnMeta):
     # course

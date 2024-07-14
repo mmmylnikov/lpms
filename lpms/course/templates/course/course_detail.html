@@ -17,6 +17,9 @@
                 {% include 'user/list_teams_review.html' %}
                 {% include 'dashboard/list_tutor_stats.html' %}
             {% endif %}
+            {% if request.user.is_admin %}
+                {% include 'dashboard/list_admin_stats.html' %}
+            {% endif %}
         {% endif %}
         {% include 'course/support_links.html' %}
     </div>
