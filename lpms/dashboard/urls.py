@@ -5,7 +5,9 @@ from dashboard.views import (StudentDashboardView, StudentTaskView,
                              TutorDashboardView, TutorReviewView,
                              ContentView, PullAutocompleteView,
                              TaskUpdateView, TutorReviewCheckView,
+                             TutorDashboardStatsView,
                              )
+from learn.enums import HomeworkStatuses
 
 
 urlpatterns = [
@@ -16,6 +18,17 @@ urlpatterns = [
           TutorDashboardView.as_view(), name='tutor_dashboard_view'),
      path('content/<str:section_type>/<int:obj_id>/<str:content_type>/',
           ContentView.as_view(), name='get_dashboard_content'),
+
+     # dashboard: analytics for tutor
+     path('review/stats/review/',
+          TutorDashboardStatsView.as_view(status=HomeworkStatuses.review),
+          name='tutor_dashboard_stats_review_view'),
+     path('review/stats/correction/',
+          TutorDashboardStatsView.as_view(status=HomeworkStatuses.correction),
+          name='tutor_dashboard_stats_correction_view'),
+     path('review/stats/execution/',
+          TutorDashboardStatsView.as_view(status=HomeworkStatuses.execution),
+          name='tutor_dashboard_stats_execution_view'),
 
      # dashboard: task (execution and review)
      path('learn/week/<int:week_number>/team/<slug:team_slug>/'

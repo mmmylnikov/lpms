@@ -150,6 +150,57 @@ class LearnMeta:
         self.support_links = support_links
         return self
 
+    def get_homework_status_ids(
+        self, tutor_id: int, status: HomeworkStatuses
+    ) -> list[int]:
+        homework_statuses = (
+            HomeworkStatus.objects.filter(
+                tutor=tutor_id,
+            )
+            .order_by("homework_id", "-updated_at")
+            .values("id", "status", "updated_at", "homework_id")
+        )
+        homework_set = set()
+        last_statuses = []
+        for homework_status in homework_statuses:
+            homework_id = homework_status["homework_id"]
+            if homework_id in homework_set:
+                continue
+            homework_set.add(homework_id)
+            last_statuses.append(
+                {
+                    "status_id": homework_status["id"],
+                    "status": homework_status["status"],
+                }
+            )
+        statuses_ids = []
+        for last_status in last_statuses:
+            if not last_status["status"] == status.name:
+                continue
+            statuses_ids.append(last_status["status_id"])
+        return statuses_ids  # type: ignore
+
+    def get_tutor_stats(self, status: HomeworkStatuses) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        homework_status_ids = self.get_homework_status_ids(
+            tutor_id=self.user.id, status=status
+        )
+        self.tutor_stats_review = (
+            HomeworkStatus.objects.filter(
+                id__in=homework_status_ids,
+                status=status.name,
+            )
+            .select_related(
+                "student",
+                "homework__challenge",
+                "homework__team__enrollment__course",
+                "homework__week",
+            )
+            .order_by("updated_at")
+        )
+        return self
+
 
 class StudentLearnMeta(LearnMeta):
     # course

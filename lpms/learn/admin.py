@@ -45,10 +45,10 @@ class HomeworkAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 
 class HomeworkStatusAdmin(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('updated_at', 'student', 'tutor', 'status', 'homework', )
+    list_display = ('updated_at',  'tutor', 'student', 'status', 'homework', )
     list_display_links = ('homework',)
     list_filter = ('homework__challenge__track', )
-    ordering = ('updated_at', )
+    ordering = ('tutor',  'student', 'updated_at', )
 
 
 class WeekAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,

@@ -217,7 +217,7 @@ class HomeworkStatus(models.Model):
     class Meta:
         verbose_name = 'Статус работы'
         verbose_name_plural = 'Статусы работ'
-        ordering = ('-created_at', )
+        ordering = ('tutor', 'student', '-updated_at', )
         get_latest_by = 'created_at'
 
 

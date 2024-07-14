@@ -13,7 +13,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from course.models import Team
 from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm
-from learn.meta import StudentLearnMeta, TutorLearnMeta
+from learn.meta import StudentLearnMeta, TutorLearnMeta, LearnMeta
 from learn.enums import HomeworkStatuses
 from user.models import Repo, Pull, User
 from user.utils import GithubApi
@@ -108,6 +108,24 @@ class TutorDashboardView(DashboardView):
                 "learn_meta": learn_meta,
             }
         )
+        return context
+
+
+class TutorDashboardStatsView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/tutor_stats.html"
+    status: HomeworkStatuses = HomeworkStatuses.review
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+
+        learn_meta = (
+            LearnMeta(user=self.request.user)
+            .get_teams()
+            .get_tutor_stats(status=self.status)
+        )
+        context.update({
+            "learn_meta": learn_meta,
+            "homework_status": self.status})
         return context
 
 

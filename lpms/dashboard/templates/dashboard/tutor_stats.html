@@ -1,17 +1,14 @@
 {% extends "dashboard_panels.html" %}
 
 {% block head_title %}
-{{ team.enrollment.slug }} | неделя {{week_number}}
+Аналитика куратора
 {% endblock head_title %}
 
 {% block leftpanel %}
 <div class="row">
     <div class="col">
         {% include 'user/list_teams_review.html' %}
-        {% include 'dashboard/list_student.html' %}
-        {% include 'dashboard/list_review.html' %}
         {% include 'dashboard/list_tutor_stats.html' %}
-        {% include 'course/support_links.html' %}
     </div>
 </div>
 {% endblock %}
@@ -20,7 +17,7 @@
 {% block rightpanel %}
 <div class="row">
     <div class="col">
-        {% include 'dashboard/team.html' %}
+        {% include 'dashboard/tutor_stats_table.html' %}
     </div>
 </div>
 {% endblock %}
