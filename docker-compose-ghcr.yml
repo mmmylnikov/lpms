@@ -31,6 +31,7 @@ services:
                     gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - lpms_static:/usr/src/app/shared/static
+      - lpms_media:/usr/src/app/shared/media
       - lpms_nginx_conf:/usr/src/app/shared/nginx
     expose:
       - 8000
@@ -46,8 +47,10 @@ services:
       - app
     volumes:
       - lpms_static:/shared/static
+      - lpms_media:/shared/media
       - lpms_nginx_conf:/etc/nginx/conf.d/
 volumes:
   lpms_db:
   lpms_static:
+  lpms_media:
   lpms_nginx_conf:
