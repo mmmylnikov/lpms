@@ -1,8 +1,9 @@
 {% if new_status %}
     {% if new_status.status == 'approved' %}
-    <div class="alert alert-success text-center" role="alert">
+    <div class="alert alert-success text-center alert-dismissible fade show" role="alert">
         <i class="bi bi-check-square"></i> 
         Работа принята!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
     </div>
     {% elif new_status.status == 'correction' %}
     <div class="alert alert-danger text-center" role="alert">

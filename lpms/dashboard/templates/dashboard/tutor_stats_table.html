@@ -22,7 +22,8 @@
             Нет отправленных заданий!
         </div>
         {% else %}
-        <table class="table table-striped table-hover table-sm">
+        <div class="table-responsive">
+        <table class="table table-striped table-hover table-sm align-top">
             <thead>
                 <tr>
                     <th scope="col">#</th>
@@ -36,18 +37,42 @@
                 {% for review in learn_meta.tutor_stats_review %}
                 <tr>
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ review.updated_at|naturaltime }}</td>
+                    <td class="">{{ review.updated_at|naturaltime }}</td>
                     <td>{{ review.homework.team.enrollment.slug }}</td>
                     <td>{{ review.student.first_name }} {{ review.student.last_name }}</td>
                     <td>
+                        
+                        {% if homework_status.name == 'review' %}
+                        <div class="btn-group pe-3" role="group" aria-label="Basic example">
+                            <a type="button" class="btn btn-outline-secondary btn-sm"
+                                    data-bs-toggle="tooltip" data-bs-title="Открыть пулл-реквест"
+                                    href="{{review.homework.repo}}">
+                                <i class="bi bi-github"></i>
+                            </a>
+                            <button type="button" class="btn btn-outline-success btn-sm"
+                                    data-bs-toggle="tooltip" data-bs-title="Обновить статус"
+                                    hx-get="{% url 'review_check_view' review.homework.pk review.pk learn_meta.user_github.extra_data.login %}" 
+                                    hx-trigger="click" hx-swap="innerHTML" hx-target="#review-github-check-{{review.pk}}">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                          </div>
+                        
                         <a href="{% url 'tutor_review_view' review.homework.week.number review.homework.team.slug review.homework.challenge.pk review.student.username %}">
                             {{review.homework.challenge.name }}
                         </a>
+                        <small>
+                            <div id="review-github-check-{{review.pk}}" class="pt-2 g-0 m-0">            
+                            </div> 
+                        </small>
+                        {% else %}
+                            {{review.homework.challenge.name }}
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        </div>
         {% endif %}
     </div>
 </div>

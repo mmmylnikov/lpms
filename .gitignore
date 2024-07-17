@@ -167,6 +167,7 @@ cython_debug/
 .DS_Store
 sandbox.ipynb
 sandbox.py
+sandbox/
 lpms/shared/static/
 lpms/shared/media/
 docker-compose.debug.yml
