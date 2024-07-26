@@ -16,8 +16,8 @@
                 {% endif %}
                  " aria-current="true">        
             <div class="d-flex w-100 justify-content-between">
-                <span>
-                    {{ team.enrollment }}<span class="fw-lighter"> | {{team.enrollment.course}}</span>
+                <span data-bs-toggle="tooltip" data-bs-title="{{team.enrollment.course}}">
+                    {{ team.enrollment }}
                 </span>
                 <small>
                         куратор {{team.tutor.get_full_name}}
