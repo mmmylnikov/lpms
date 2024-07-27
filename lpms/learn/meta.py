@@ -359,7 +359,9 @@ class StudentLearnMeta(LearnMeta):
                 task = None
                 task_status = None
                 week_tasks = [
-                    task for task in tasks if task.challenge == challenge
+                    task for task in tasks if all([
+                        task.challenge == challenge,
+                        task.team.enrollment == self.enrollment,])
                 ]
                 if week_tasks:
                     task = week_tasks[0]
