@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from django.db import models
 from django.urls import reverse_lazy
-
 
 from user.models import User
 
@@ -45,6 +46,12 @@ class Enrollment(models.Model):
     def slug(self) -> str:
         title_words = self.course.name.split(' ')
         return f"{''.join([s[0].upper() for s in title_words])}{self.number}"
+
+    @property
+    def is_completed(self) -> bool:
+        return self.finish < datetime.now().date()
+    is_completed.fget.boolean = True  # type: ignore
+    is_completed.fget.short_description = 'Завершен'  # type: ignore
 
     def __str__(self) -> str:
         return self.slug

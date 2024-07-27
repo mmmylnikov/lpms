@@ -27,6 +27,7 @@ class LearnMeta:
     tasks_status_learn: QuerySet[HomeworkStatus] | None
     account_fullness_errors: list[str]
     support_links: list[tuple[str, str]]
+    incompleted_enrollments: list[Enrollment]
 
     def __init__(self, user: User | AnonymousUser) -> None:
         self.user = user
@@ -52,9 +53,17 @@ class LearnMeta:
         )
         return self.teams_review
 
+    def get_incompleted_enrollments(self) -> None:
+        self.incompleted_enrollments = [
+            enrollment
+            for enrollment in Enrollment.objects.all().select_related('course')
+            if not enrollment.is_completed
+        ]
+
     def get_teams(self) -> Self:
         self.get_teams_learn()
         self.get_teams_review()
+        self.get_incompleted_enrollments()
         return self
 
     def get_tasks_learn(self, only_at_work: bool = True) -> Self:
@@ -190,6 +199,7 @@ class LearnMeta:
             HomeworkStatus.objects.filter(
                 id__in=homework_status_ids,
                 status=status.name,
+                homework__team__enrollment__in=self.incompleted_enrollments,
             )
             .select_related(
                 "student",
@@ -216,6 +226,9 @@ class LearnMeta:
                 HomeworkStatus.objects.filter(
                     id__in=homework_status_ids,
                     status=status.name,
+                    homework__team__enrollment__in=(
+                        self.incompleted_enrollments
+                        ),
                 )
                 .select_related(
                     "student",

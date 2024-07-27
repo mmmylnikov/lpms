@@ -8,7 +8,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 class EnrollmentAdmin(admin.ModelAdmin):
-    list_display = ('slug', 'start', 'finish')
+    list_display = ('slug', 'start', 'finish', 'is_completed', )
     list_filter = ('course', )
 
 
