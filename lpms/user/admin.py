@@ -19,8 +19,9 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
             'password',
             )}),
         ('Доступы', {'fields': (
+            'is_active',
             'is_tutor', 'is_admin',
-            'is_active', 'is_staff', 'is_superuser',
+            'is_staff', 'is_superuser',
             )}),
       )
     list_display = (

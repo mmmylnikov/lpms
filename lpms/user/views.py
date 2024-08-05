@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from user.models import User
 from user.forms import UserUpdateForm
 from learn.meta import LearnMeta
+from learn.models import Team
 from notify.services import switch_notify, get_notify_status
 
 
@@ -30,6 +31,43 @@ class UserDetailView(DetailView):
             .check_account_fullness()
         )
         return context
+
+    def render_to_response(
+        self, context: dict[str, Any], **response_kwargs: Any
+    ) -> HttpResponse:
+        redirect_home_response = redirect("home", permanent=False)
+        user_request = self.request.user
+        if isinstance(user_request, AnonymousUser):
+            return redirect_home_response
+        user_profile = context['user']
+        show_profile_response = super().render_to_response(
+            context, **response_kwargs
+        )
+        if user_request == user_profile:
+            return show_profile_response
+        else:
+            if user_request.is_admin:
+                # admin - can watch all users
+                return show_profile_response
+            elif user_request.is_tutor:
+                # tutor - can watch only your students
+                teams = Team.objects.filter(tutor=user_request).select_related(
+                    "students"
+                )
+                students_id = set(
+                    [ids["students"] for ids in list(teams.values("students"))]
+                )
+                if user_profile.id in students_id:
+                    return show_profile_response
+            else:
+                # student - can watch only your tutors
+                teams = user_request.team_set.all().select_related('tutor')
+                tutors_id = set(
+                    [ids["tutor"] for ids in list(teams.values("tutor"))]
+                )
+                if user_profile.id in tutors_id:
+                    return show_profile_response
+        return redirect_home_response
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
@@ -52,7 +90,6 @@ class UserNotifySwitchView(LoginRequiredMixin, TemplateView):
         self, context: dict[str, Any], **response_kwargs: Any
     ) -> HttpResponse:
         return redirect("user_detail_view", slug=self.request.user.username)
-        # return super().render_to_response(context, **response_kwargs)
 
     def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
