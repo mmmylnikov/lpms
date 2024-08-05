@@ -9,8 +9,18 @@
     {% else %}
     <div class="list-group list-group-flush" style="max-height: 200px; overflow: scroll;">
         {% for status in learn_meta.get_tasks_status_latest %}
-        {% if status.status != 'available' %}
-        <a href="{{status.homework.get_student_absolute_url}}"  
+        {% if status.status not in 'available,approved' %}
+        <a href="
+        {% if status.homework.team.tutor == request.user %}
+            {% if status.status == 'review' %}
+            {{status.homework.get_tutor_absolute_url}}
+            {% else %}
+            #
+            {% endif %}
+        {% else %}
+        {{status.homework.get_student_absolute_url}}
+        {% endif %}
+        "  
            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center 
                   bg-{{status.status_color}}-subtle" aria-current="true">        
             <div class="d-flex w-100 justify-content-between">

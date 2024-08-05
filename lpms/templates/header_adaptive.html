@@ -18,7 +18,7 @@
         <li class="nav-item dropdown pe-3 dropstart ">
             <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                <img {% if learn_meta.user_github %} src="{{ learn_meta.user_github.extra_data.avatar_url}}" {% else %}
+                <img {% if request.user.github_account %} src="{{ request.user.github_account.extra_data.avatar_url}}" {% else %}
                     src="{% static 'placeholders/user2.png' %}" {% endif %} alt="mdo" width="32" height="32"
                     class="rounded-circle border">
             </a>

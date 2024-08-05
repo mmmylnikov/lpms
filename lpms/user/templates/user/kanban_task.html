@@ -12,7 +12,13 @@
                     <div class="list-group list-group-flush">
                         {% for status in learn_meta.get_tasks_status_latest %}
                         {% if status.status == 'execution' %}
-                        <a href="{{status.homework.get_student_absolute_url}}" 
+                        <a href="
+                        {% if status.homework.team.tutor == request.user %}
+                        #
+                        {% else %}
+                        {{status.homework.get_student_absolute_url}}
+                        {% endif %}
+                        " 
                            class="list-group-item list-group-item-action " aria-current="true">
                             <small>{{ status.homework.challenge.name }}</small>
                         </a>
@@ -29,7 +35,13 @@
                     <div class="list-group list-group-flush">
                         {% for status in learn_meta.get_tasks_status_latest %}
                         {% if status.status == 'review' %}
-                        <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                        <a href="
+                        {% if status.homework.team.tutor == request.user %}
+                        {{status.homework.get_tutor_absolute_url}}
+                        {% else %}
+                        {{status.homework.get_student_absolute_url}}
+                        {% endif %}
+                        " class="list-group-item list-group-item-action "
                             aria-current="true">
                             <small>{{ status.homework.challenge.name }}</small>
                         </a>
@@ -46,7 +58,13 @@
                     <div class="list-group list-group-flush">
                         {% for status in learn_meta.get_tasks_status_latest %}
                         {% if status.status == 'correction' %}
-                        <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                        <a href="
+                        {% if status.homework.team.tutor == request.user %}
+                        #
+                        {% else %}
+                        {{status.homework.get_student_absolute_url}}
+                        {% endif %}
+                        " class="list-group-item list-group-item-action "
                             aria-current="true">
                             <small>{{ status.homework.challenge.name }}</small>
                         </a>
@@ -63,7 +81,13 @@
                     <div class="list-group list-group-flush">
                         {% for status in learn_meta.get_tasks_status_latest %}
                         {% if status.status == 'approved' %}
-                        <a href="{{status.homework.get_student_absolute_url}}" class="list-group-item list-group-item-action "
+                        <a href="
+                        {% if status.homework.team.tutor == request.user %}
+                        #
+                        {% else %}
+                        {{status.homework.get_student_absolute_url}}
+                        {% endif %}
+                        " class="list-group-item list-group-item-action "
                             aria-current="true">
                             <small>{{ status.homework.challenge.name }}</small>
                         </a>

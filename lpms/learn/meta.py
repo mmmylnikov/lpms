@@ -94,6 +94,7 @@ class LearnMeta:
             "homework__team",
             "homework__team__enrollment",
             "homework__team__enrollment__course",
+            "homework__team__tutor",
         )
         return self
 

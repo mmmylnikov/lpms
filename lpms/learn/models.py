@@ -174,6 +174,14 @@ class Homework(models.Model):
             'challenge_id': self.challenge.pk,
             })
 
+    def get_tutor_absolute_url(self) -> str:
+        return reverse_lazy("tutor_review_view", kwargs={
+            'week_number': self.week.number,
+            'team_slug': self.team.slug,
+            'challenge_id': self.challenge.pk,
+            'username': self.user.username,
+            })
+
     class Meta:
         verbose_name = 'Работа'
         verbose_name_plural = 'Работы'
