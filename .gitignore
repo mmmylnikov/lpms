@@ -4,6 +4,10 @@ htmx.min.js
 lpms/static/icons/
 lpms/static/placeholders/
 
+# static
+lpms/static/favicons/
+lpms/static/logo/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -170,6 +174,7 @@ sandbox.py
 sandbox/
 lpms/shared/static/
 lpms/shared/media/
+lpms/shared/emails/
 docker-compose.debug.yml
 lpms/db_test.json
 dev/
