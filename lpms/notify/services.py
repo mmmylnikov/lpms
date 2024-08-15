@@ -1,5 +1,6 @@
 from django.template import loader
 
+from config.settings import TELEGRAM_BOT_USERNAME
 from user.models import User
 from notify.models import Account, Provider, Status, Message
 from notify.enums import Providers, MessageTemplates, MessageStatuses
@@ -22,7 +23,11 @@ def save_message(user: User, account: Account, text: str,
 def get_notify_status(user: User) -> str:
     accounts = Account.objects.filter(user=user)
     template = loader.get_template('notify/notify_help.html')
-    context = {'user': user, 'accounts': accounts}
+    context = {
+        "user": user,
+        "accounts": accounts,
+        "tg_bot_username": TELEGRAM_BOT_USERNAME,
+    }
     return template.render(context)
 
 
