@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyo
+*.mo
+
+# Database files
+*.db
+*.sqlite3
+
+# Logs and cache
+*.log
+*.cache
+*.sql.gz
+
+# IDE and editor files
+.idea/
+.vscode/
+.DS_Store
+
+# Git and other version control files
+.git/
+.gitignore
+
+# Docker and other build files
+Dockerfile
+docker-compose.yml
+
+# Other files and directories to ignore
+.env
+dev/
