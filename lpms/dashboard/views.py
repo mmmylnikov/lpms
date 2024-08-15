@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Any
+from datetime import date
 
 from django.forms import BaseModelForm
 from django.views.generic import TemplateView, UpdateView
@@ -22,6 +23,7 @@ from user.utils import GithubApi
 class DashboardView(LoginRequiredMixin, TemplateView):
     team: Team
     week_number: int
+    now: date = date.today()
 
     def get_context_data(self, **kwargs: dict) -> dict:
         context = super().get_context_data(**kwargs)
@@ -34,6 +36,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             {
                 "team": self.team,
                 "week_number": self.week_number,
+                "now": self.now,
             }
         )
         return context
@@ -76,12 +79,6 @@ class StudentDashboardView(DashboardView):
         self, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse | HttpResponseNotFound:
         context = self.get_context_data(**kwargs)
-        if hasattr(context["learn_meta"], "week_current_number"):
-            if (
-                context["learn_meta"].week_current_number
-                < context["week"].number
-            ):
-                return HttpResponseNotFound()
         return self.render_to_response(context)
 
 
