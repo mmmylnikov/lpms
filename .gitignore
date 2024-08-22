@@ -179,3 +179,4 @@ docker-compose.debug.yml
 lpms/db_test.json
 dev/
 .VSCodeCounter/
+.github/workflows/deploy.secrets

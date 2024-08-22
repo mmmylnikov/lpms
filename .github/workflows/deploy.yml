@@ -1,0 +1,32 @@
+name: Build and deploy Docker container
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Run a test command
+      run: echo "This is a test command"
+    - name: Login to DockerHub (or Another) Registry
+      run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_HOST }} -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+    - name: Build the tagged Docker image
+      run: docker build . --file Dockerfile --tag ${{ secrets.REGISTRY_TAG }}
+    - name: Push the tagged Docker image
+      run: docker push ${{ secrets.REGISTRY_TAG }}
+    - name: login to server and pull container
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        port: ${{ secrets.PORT }}
+        password: ${{ secrets.PASSWORD }}
+        script_stop: true
+        script: |
+          cd /opt/servers/lmslearnpython/
+          docker-compose pull lmslearnpython
+          docker-compose exec -i lmslearnpython python3 manage.py migrate --noinput
+          docker-compose exec -i lmslearnpython python3 manage.py collectstatic --noinput

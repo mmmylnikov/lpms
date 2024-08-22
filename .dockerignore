@@ -20,12 +20,19 @@
 # Git and other version control files
 .git/
 .gitignore
+.github/
 
 # Docker and other build files
 Dockerfile
 docker-compose.yml
+docker-compose-ghcr.yml
 
 # Other files and directories to ignore
 .env
-dev/
+env
+venv/
 .mypy_cache
+.VSCodeCounter/
+dev/
+sandbox/
+demo/
