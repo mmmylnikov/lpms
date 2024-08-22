@@ -1,0 +1,12 @@
+{% extends "socialaccount/base_entrance.html" %}
+{% load i18n %}
+{% load allauth %}
+{% block head_title %}
+    Ошибка входа в систему
+{% endblock head_title %}
+{% block content %}
+    {% element h1 %}
+        Ошибка входа в систему
+    {% endelement %}
+    <p>При попытке входа в систему через вашу стороннюю учетную запись произошла ошибка.</p>
+{% endblock content %}

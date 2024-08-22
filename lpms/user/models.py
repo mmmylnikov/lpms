@@ -6,8 +6,6 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group as AbstractGroup
 from django.urls import reverse_lazy
 
-
-from user.enums import GroupEnum
 from user.utils import GithubApi
 
 
@@ -92,6 +90,14 @@ class User(AbstractUser):
     notify = models.BooleanField(
         default=False,
         verbose_name='Присылать уведомления')
+    is_tutor = models.BooleanField(
+        default=False,
+        verbose_name='Куратор',
+    )
+    is_admin = models.BooleanField(
+        default=False,
+        verbose_name='Администратор',
+    )
 
     @property
     def notify_icon(self) -> str:
@@ -112,10 +118,33 @@ class User(AbstractUser):
             return None
 
     @property
-    def is_tutor(self) -> bool:
-        if self.groups.filter(pk=GroupEnum.GROUP_TUTOR_ID.value).count() > 0:
-            return True
-        return False
+    def full_name(self) -> str:
+        return f'{self.last_name} {self.first_name}'
+    full_name.fget.short_description = 'ФИО'  # type: ignore
+
+    @property
+    def github_url(self) -> str | None:
+        if not self.gh_username:
+            return None
+        return f'https://github.com/{self.gh_username}'
+
+    @property
+    def tg_url(self) -> str | None:
+        if not self.tg_username:
+            return None
+        return f'https://t.me/{self.tg_username}'
+
+    @property
+    def email_url(self) -> str | None:
+        if not self.email:
+            return None
+        return f'mailto:{self.email}'
+
+    # @property
+    # def is_tutor(self) -> bool:
+    #     if self.groups.filter(pk=GroupEnum.GROUP_TUTOR_ID.value).count() > 0:
+    #         return True
+    #     return False
 
     def switch_notify(self) -> bool:
         self.notify = not self.notify

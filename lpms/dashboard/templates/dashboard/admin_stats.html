@@ -1,0 +1,22 @@
+{% extends "dashboard_panels.html" %}
+
+{% block head_title %}
+Аналитика администратора
+{% endblock head_title %}
+
+{% block leftpanel %}
+<div class="row">
+    <div class="col">
+        {% include 'dashboard/list_admin_stats.html' %}
+    </div>
+</div>
+{% endblock %}
+
+
+{% block rightpanel %}
+<div class="row">
+    <div class="col">
+        {% include 'dashboard/admin_stats_table.html' %}
+    </div>
+</div>
+{% endblock %}

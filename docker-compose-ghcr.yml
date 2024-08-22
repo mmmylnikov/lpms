@@ -16,11 +16,11 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
   app:
     image: ghcr.io/mmmylnikov/lpms:latest
     restart: always
@@ -31,6 +31,7 @@ services:
                     gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - lpms_static:/usr/src/app/shared/static
+      - lpms_media:/usr/src/app/shared/media
       - lpms_nginx_conf:/usr/src/app/shared/nginx
     expose:
       - 8000
@@ -41,13 +42,15 @@ services:
     image: nginx:latest
     restart: always
     ports:
-      - 80:80
+      - 8080:80
     depends_on:
       - app
     volumes:
       - lpms_static:/shared/static
+      - lpms_media:/shared/media
       - lpms_nginx_conf:/etc/nginx/conf.d/
 volumes:
   lpms_db:
   lpms_static:
+  lpms_media:
   lpms_nginx_conf:

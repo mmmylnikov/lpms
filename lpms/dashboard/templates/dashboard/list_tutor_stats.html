@@ -1,0 +1,26 @@
+<div class="card mb-3">
+    <div class="card-header">
+        Аналитика 
+    </div>
+    
+    <div class="list-group list-group-flush">
+        <a href="{% url 'tutor_dashboard_stats_review_view' %}" 
+           class="list-group-item list-group-item-action
+                 {% if homework_status.value.name == 'review' %}bg-secondary-subtle{% endif %}">
+            <i class="bi bi-check-square"></i>
+            Задания на проверку
+        </a>
+        <a href="{% url 'tutor_dashboard_stats_correction_view' %}"
+           class="list-group-item list-group-item-action
+                 {% if homework_status.value.name == 'correction' %}bg-secondary-subtle{% endif %}">
+            <i class="bi bi-exclamation-square"></i>
+            Задания отправленные на доработку
+        </a>
+        <a href="{% url 'tutor_dashboard_stats_execution_view' %}"
+           class="list-group-item list-group-item-action
+                 {% if homework_status.value.name == 'execution' %}bg-secondary-subtle{% endif %}">
+            <i class="bi bi-pencil-square"></i>
+            Невыполненные задания
+        </a>
+      </div>
+</div>

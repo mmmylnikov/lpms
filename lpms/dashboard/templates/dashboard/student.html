@@ -9,7 +9,10 @@
 <div class="row">
     <div class="col">
         {% include 'user/list_teams_learn.html' %}
+        {% if learn_meta.week_current_number >= week.number %}
         {% include 'dashboard/list_task.html' %}
+        {% endif %}
+        {% include 'course/support_links.html' %}
     </div>
 </div>
 {% endblock %}
@@ -18,7 +21,15 @@
 {% block rightpanel %}
 <div class="row">
     <div class="col">
+        {% if learn_meta.week_current_number >= week.number %}
         {% include 'dashboard/team.html' %}
+        {% endif %}
+
+        {% if learn_meta.team.enrollment.start > now %}
+        <div class="alert alert-warning" role="alert">
+            Курс еще не начался!
+          </div>
+        {% endif %}
     </div>
 </div>
 

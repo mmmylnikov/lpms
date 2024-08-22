@@ -1,28 +1,30 @@
-# CORE
-DEBUG=True  # leave it empty if production
+# основные:
+DEBUG=
 DJANGO_SECRET_KEY=
-DJANGO_ALLOWED_HOSTS=  # a list, for example: 127.0.0.1,localhost,[::1]
+DJANGO_ALLOWED_HOSTS=
+CSRF_TRUSTED_ORIGINS=
 
-# DATABASE
-#If you use SQLite3:
-DATABASE_ENGINE=sqlite3
-
-# If you use PostgreSQL:
+# база данных (если используете PostgreSQL)
 DATABASE_ENGINE=postgresql
-DATABASE_NAME=
-DATABASE_USERNAME=
-DATABASE_PASSWORD=
-DATABASE_HOST=  # if you use the built-in, use: db
+DATABASE_NAME=lmpsdb
+DATABASE_USERNAME=lpmsuser
+DATABASE_PASSWORD=lpmspassword
+DATABASE_HOST=db
 DATABASE_PORT=5432
 DATABASE_OPTIONS={}
 
-# GITHUB OAuth
+# база данных (если используете SQLite)
+# DATABASE_ENGINE=sqlite3
+# другие настройки для SQLite не требуются
+
+# авторизация OAuth:
 GITHUB_OAUTH_CLIENT_ID=
 GITHUB_OAUTH_SECRET=
-GITHUB_OAUTH_REDIRECT_URL=http://{YOUR_HOST}:8000/oauth/accounts/github/login/callback/
+GITHUB_OAUTH_REDIRECT_URL=
 
-# GITHUB API 
+# автокомплит и проверка работ
 GITHUB_API_TOKEN=
 
-# NOTIFY
+# уведомления
 TELEGRAM_BOT_TOKEN=
+TELEGRAM_BOT_USERNAME=

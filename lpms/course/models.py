@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from django.db import models
 from django.urls import reverse_lazy
-
 
 from user.models import User
 
@@ -8,6 +9,8 @@ from user.models import User
 class Course(models.Model):
     name = models.CharField(max_length=128, verbose_name='Название')
     description = models.TextField(verbose_name='Описание')
+    tg_chat = models.CharField(max_length=256, verbose_name='Телеграм чат',
+                               blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -34,6 +37,8 @@ class Enrollment(models.Model):
     number = models.PositiveSmallIntegerField(verbose_name='Номер')
     start = models.DateField(verbose_name='Старт')
     finish = models.DateField(verbose_name='Финиш')
+    tg_chat = models.CharField(max_length=256, verbose_name='Телеграм чат',
+                               blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -41,6 +46,12 @@ class Enrollment(models.Model):
     def slug(self) -> str:
         title_words = self.course.name.split(' ')
         return f"{''.join([s[0].upper() for s in title_words])}{self.number}"
+
+    @property
+    def is_completed(self) -> bool:
+        return self.finish < datetime.now().date()
+    is_completed.fget.boolean = True  # type: ignore
+    is_completed.fget.short_description = 'Завершен'  # type: ignore
 
     def __str__(self) -> str:
         return self.slug
@@ -59,6 +70,8 @@ class Team(models.Model):
                               verbose_name='Куратор', related_name='tutor')
     students = models.ManyToManyField(User, verbose_name='Студенты',
                                       blank=True)
+    tg_chat = models.CharField(max_length=256, verbose_name='Телеграм чат',
+                               blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 

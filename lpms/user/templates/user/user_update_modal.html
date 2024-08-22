@@ -10,10 +10,12 @@
                 <div hx-get="{% url 'user_update_view' request.user.username %}" hx-trigger="load" hx-swap="innerHTML">
                     User
                     Update Form</div>
+                
             </div>
+            
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Отменить</button>
-                <button type="submit" class="btn btn-primary btn-sm" form="UserUpdateForm"">Сохранить изменения</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                <button type="submit" class="btn btn-primary" form="UserUpdateForm"">Сохранить изменения</button>
         </div>
         </div>
     </div>

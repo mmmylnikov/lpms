@@ -4,7 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,6 +19,9 @@ ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
 CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
 INSTALLED_APPS = [
+    # Admin interface
+    'admin_interface',
+    'colorfield',
     # LPMS
     'user.apps.UserConfig',
     'course.apps.CourseConfig',
@@ -29,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -43,6 +47,9 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
 ]
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
+SILENCED_SYSTEM_CHECKS = ["security.W019"]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -126,6 +133,13 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
+MEDIA_URL = 'media/'
+
+MEDIA_ROOT = SHARED_ROOT / 'media'
+
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = SHARED_ROOT / "emails/app-messages"
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = getenv('INTERNAL_IPS', '').split(',')
@@ -139,6 +153,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "none"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
@@ -154,9 +169,10 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+# LOGIN_REDIRECT_URL = 'home'
+# LOGOUT_REDIRECT_URL = 'home'
 
 GITHUB_API_TOKEN = getenv('GITHUB_API_TOKEN')
 
 TELEGRAM_BOT_TOKEN = getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_BOT_USERNAME = getenv('TELEGRAM_BOT_USERNAME')

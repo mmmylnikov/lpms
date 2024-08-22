@@ -6,9 +6,13 @@
                 <span class="fw-lighter">| {{ learn_meta.course }} </span>
                 
             </div>
-            <div class="col text-end"> 
-                <small class="fw-lighter">неделя {{ learn_meta.week_current_number }}/{{ learn_meta.weeks.count }} |</small>
-                <small class="fw-lighter">куратор 
+            <div class="col text-end">
+                {% if learn_meta.enrollment.is_completed %}
+                <span class="badge text-bg-success">курс завершен</span>
+                {% else %}
+                <small class="fw-lighter">неделя {{ learn_meta.week_current_number }}/{{ learn_meta.weeks.count }}</small>
+                {% endif %}
+                <small class="fw-lighter">| куратор 
                     <a href="{% url 'user_detail_view' learn_meta.tutor.username %}">{{ learn_meta.tutor.get_full_name }}</a>
                 </small>
             </div>

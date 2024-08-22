@@ -1,3 +1,13 @@
+# css/js/icons
+*bootstrap*
+htmx.min.js
+lpms/static/icons/
+lpms/static/placeholders/
+
+# static
+lpms/static/favicons/
+lpms/static/logo/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -161,8 +171,12 @@ cython_debug/
 .DS_Store
 sandbox.ipynb
 sandbox.py
+sandbox/
 lpms/shared/static/
+lpms/shared/media/
+lpms/shared/emails/
 docker-compose.debug.yml
 lpms/db_test.json
 dev/
 .VSCodeCounter/
+.github/workflows/deploy.secrets

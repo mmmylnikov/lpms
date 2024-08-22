@@ -1,7 +1,6 @@
 version: '3.9'
 
 services:
-  
   db:
     image: postgres
     ports:
@@ -17,42 +16,20 @@ services:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-  app:
-    build: ./lpms
+  lmslearnpython:
+    image: ghcr.io/mmmylnikov/lpms:lp2409
     restart: always
     depends_on:
       - db
-    command: sh -c "python manage.py migrate &&
-                    python manage.py collectstatic --noinput &&
-                    python manage.py loaddata db_test.json &&
-                    gunicorn config.wsgi:application --bind 0.0.0.0:8000"
     volumes:
       - lpms_static:/usr/src/app/shared/static
-      - lpms_nginx_conf:/usr/src/app/shared/nginx
-    expose:
-      - 8000
+      - lpms_media:/usr/src/app/shared/media
+    ports:
+      - 8000:8000
     env_file:
       - path: ./.env
         required: true
-  nginx:
-    image: nginx:latest
-    restart: always
-    ports:
-      - 80:80
-    depends_on:
-      - app
-    volumes:
-      - lpms_static:/shared/static
-      - lpms_nginx_conf:/etc/nginx/conf.d/
-
 volumes:
   lpms_db:
   lpms_static:
-  lpms_nginx_conf:
-
-
+  lpms_media:

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_adaptive.html" %}
 
 {% load socialaccount %}
 
@@ -36,3 +36,8 @@
     </div>
 </div>
 {% endblock %}
+
+{% block messages %}
+{% include 'user/msg_account_fullness_errors.html' %}
+{% endblock %}
+

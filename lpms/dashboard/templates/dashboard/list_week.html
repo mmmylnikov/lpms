@@ -6,6 +6,7 @@
 {% else %}
 <ul class="nav nav-underline mb-3">
     {% for w in learn_meta.weeks.all %}
+    {% if learn_meta.week_current_number >= w.number %}
     <li class="nav-item">
         {% if w.number == week_number %}
         <a class="nav-link active" aria-current="page" >Неделя {{ w.number }}</a>
@@ -20,6 +21,7 @@
               ">Неделя {{ w.number }}</a>
         {% endif %}
     </li>
+    {% endif %}
     {% endfor%}
 </ul>
 {% endif %}

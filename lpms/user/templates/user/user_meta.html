@@ -1,22 +1,41 @@
+{% load static %}
+
 <div class="card shadow-sm ">
-    <img src="{{accounts.github.0.extra_data.avatar_url}}" class="card-img-top" alt="user_avatar">
+    {% if accounts.github.0 %}
+    <img 
+        src="{{accounts.github.0.extra_data.avatar_url}}" 
+        class="card-img-top" alt="user_avatar"">
+    {% endif %}
     <div class="card-body">
         <h3>{{ user.get_full_name }}</h3>
         <ul class="list-group">
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="bi bi-person-circle"> Username</span>
+                <span>
+                    <i class="bi bi-person-circle me-2 align-baseline"></i>Username
+                </span>
                 <span class="badge text-bg-light rounded-pill">{{ user.username}}</span>
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="bi bi-github"> GitHub</span>
+                <span>
+                    <i class="bi bi-github me-2 align-baseline"></i> GitHub
+                
+                </span>
+                {% if accounts.github.0 %}
                 <span class="badge text-bg-light rounded-pill">
                     <a href="{{accounts.github.0.extra_data.html_url}}" target="_blank">
                         {{accounts.github.0.extra_data.login}}
                     </a>
                 </span>
+                {% else %}
+                <a type="button" class="btn btn-primary btn-sm" type="button"
+                   href="{% url 'socialaccount_connections' %}">Привязать GitHub</a>
+                {% endif %}
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span class="bi bi-telegram"> Telegram</span>
+                <span>
+                    <i class="bi bi-telegram me-2 align-baseline"></i>Telegram
+                </span>
+                {% if user.tg_username %}
                 <span>
                     {% if user == request.user %}
                     <i class="{{user.notify_icon}}"></i>
@@ -27,25 +46,30 @@
                         </a>
                     </span>
                 </span>
+                {% else %}
+                <span class="badge text-bg-light rounded-pill">Не указан</span>
+                {% endif %}
                 
             </li>
         </ul>
         <div class="d-flex justify-content-between align-items-center pt-2">
             <div class="btn-group">
                 {% if user == request.user %}
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                    data-bs-target="#modalUserUpdate">
-                    Редактировать профиль
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                    data-bs-target="#modalUserNotify">
-                    {% if not user.notify %}
-                    Включить 
-                    {% else %}
-                    Выключить
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                        data-bs-target="#modalUserUpdate">
+                        Редактировать профиль
+                    </button>
+                    {% if user.tg_username %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                        data-bs-target="#modalUserNotify">
+                        {% if not user.notify %}
+                        Включить 
+                        {% else %}
+                        Выключить
+                        {% endif %}
+                        уведомления
+                    </button>
                     {% endif %}
-                    уведомления
-                </button>
                 {% endif %}
             </div>
         </div>

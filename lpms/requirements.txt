@@ -2,6 +2,7 @@ Django==5.0.3
 django-allauth==0.61.1
 django-import-export==3.3.7
 django-debug-toolbar==4.3.0
+django-admin-interface==0.28.6
 Markdown==3.6
 PyGithub==2.3.0
 python-dotenv==1.0.1

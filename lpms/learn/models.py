@@ -30,6 +30,7 @@ class Lesson(models.Model):
                             verbose_name='Репозиторий')
     url = models.CharField(max_length=512, null=True, blank=True,
                            verbose_name='Ссылка')
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок', default=0)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -38,6 +39,12 @@ class Lesson(models.Model):
         if not self.video:
             return None
         return self.video.replace('https://www.youtube.com/watch?v=', '')
+
+    @property
+    def slide_embed_url(self) -> str | None:
+        if not self.slide:
+            return None
+        return self.slide.replace('/pub?', '/embed?')
 
     @property
     def added(self) -> str:
@@ -55,12 +62,12 @@ class Lesson(models.Model):
         return ', '.join(output)
 
     def __str__(self) -> str:
-        return f'{self.track} - {self.name}'
+        return f'{self.track} - {self.name} ({self.order})'
 
     class Meta:
         verbose_name = 'Урок'
         verbose_name_plural = 'Уроки'
-        ordering = ('track', 'created_at', 'name', )
+        ordering = ('track', 'order', 'name', )
         get_latest_by = 'created_at'
 
 
@@ -73,6 +80,7 @@ class Challenge(models.Model):
                             verbose_name='Репозиторий')
     url = models.CharField(max_length=512, null=True, blank=True,
                            verbose_name='Ссылка')
+    order = models.PositiveSmallIntegerField(verbose_name='Порядок', default=0)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -93,12 +101,12 @@ class Challenge(models.Model):
         return ', '.join(output)
 
     def __str__(self) -> str:
-        return f'{self.track} - {self.name}'
+        return f'{self.track} - {self.name} ({self.order})'
 
     class Meta:
         verbose_name = 'Задание'
         verbose_name_plural = 'Задания'
-        ordering = ('track', 'created_at', 'name', )
+        ordering = ('track', 'order', 'name', )
         get_latest_by = 'created_at'
 
 
@@ -166,6 +174,14 @@ class Homework(models.Model):
             'challenge_id': self.challenge.pk,
             })
 
+    def get_tutor_absolute_url(self) -> str:
+        return reverse_lazy("tutor_review_view", kwargs={
+            'week_number': self.week.number,
+            'team_slug': self.team.slug,
+            'challenge_id': self.challenge.pk,
+            'username': self.user.username,
+            })
+
     class Meta:
         verbose_name = 'Работа'
         verbose_name_plural = 'Работы'
@@ -209,7 +225,7 @@ class HomeworkStatus(models.Model):
     class Meta:
         verbose_name = 'Статус работы'
         verbose_name_plural = 'Статусы работ'
-        ordering = ('-created_at', )
+        ordering = ('tutor', 'student', '-updated_at', )
         get_latest_by = 'created_at'
 
 

@@ -1,0 +1,70 @@
+{% load humanize %}
+
+<div class="card">
+    <div class="card-header  ">
+        <div class="row">
+            <div class="col">
+                Аналитика работы кураторов
+                <span class="fw-lighter">| {{homework_status.value.label_plural}}</span>
+
+            </div>
+            {% if learn_meta.tutor_stats_review %}
+            <div class="col text-end">
+                <small class="fw-lighter">{{ learn_meta.tutor_stats_review.count }} работ</small>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+    <div class="accordion accordion-flush pb-1" id="accordionPanelsStayOpenTutor">
+        {% for tutor, stat in learn_meta.admin_stats.items %}
+            <div class="accordion-item">
+              <h2 class="accordion-header ">
+                <button class="accordion-button " type="button" 
+                        data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse{{tutor.pk}}" 
+                        aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                        {{tutor.full_name}}
+                        <span class="badge rounded-pill bg-primary ms-3">
+                            {{stat.count}}
+                        </span>
+                </button>
+              </h2>
+              <div id="panelsStayOpen-collapse{{tutor.pk}}" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    {% if not stat %}
+                    <div class="alert alert-primary" role="alert">
+                        Нет отправленных заданий!
+                    </div>
+                    {% else %}
+                    <table class="table table-striped table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col"> {{homework_status.value.label_action_tutor}}</th>
+                                <th scope="col">Поток</th>
+                                <th scope="col">Студент</th>
+                                <th scope="col">Работа</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for review in stat %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ review.updated_at|naturaltime }}</td>
+                                <td>{{ review.homework.team.enrollment.slug }}</td>
+                                <td>{{ review.student.first_name }} {{ review.student.last_name }}</td>
+                                <td>
+                                    {{review.homework.challenge.name }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+                  
+                </div>
+              </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
