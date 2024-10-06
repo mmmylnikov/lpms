@@ -26,6 +26,9 @@
 Dockerfile
 docker-compose.yml
 docker-compose-ghcr.yml
+.dockerignore
+lpms/Dockerfile
+lpms/.dockerignore
 
 # Other files and directories to ignore
 .env
@@ -36,3 +39,6 @@ venv/
 dev/
 sandbox/
 demo/
+lpms/.mypy_cache/
+lpms/.DS_Store
+assets/
