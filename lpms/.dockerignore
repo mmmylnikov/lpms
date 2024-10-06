@@ -24,8 +24,10 @@
 # Docker and other build files
 Dockerfile
 docker-compose.yml
+.dockerignore
 
 # Other files and directories to ignore
 .env
 dev/
-.mypy_cache
+.mypy_cache/
+.DS_Store
