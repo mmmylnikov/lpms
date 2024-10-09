@@ -42,3 +42,4 @@ demo/
 lpms/.mypy_cache/
 lpms/.DS_Store
 assets/
+s3/

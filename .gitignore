@@ -181,3 +181,4 @@ dev/
 .VSCodeCounter/
 .github/workflows/deploy.secrets
 assets/
+s3/

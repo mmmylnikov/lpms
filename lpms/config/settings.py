@@ -46,7 +46,49 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.github",
+    # pip install django-dbbackup
+    'dbbackup',
 ]
+
+
+DBBACKUP_DATE_FORMAT = getenv('DBBACKUP_DATE_FORMAT', '%Y%m%d_%H%M%S')
+DBBACKUP_FILENAME_TEMPLATE = getenv('DBBACKUP_FILENAME_TEMPLATE', '{content_type}_{databasename}_{datetime}.{extension}')
+
+STORAGES = {
+    "dbbackup": {
+        # "BACKEND": "django.core.files.storage.FileSystemStorage",
+        # "OPTIONS": {
+        #     "location": "/Users/mylnikov/Sync/edu/lpa/lpms/s3/backup",
+        # },
+        "BACKEND": getenv('STORAGE_DBBACKUP_BACKEND', 'storages.backends.s3boto3.S3Boto3Storage'),
+        "OPTIONS": {
+            'access_key': getenv('STORAGE_DBBACKUP_access_key', 'access_key'),
+            'secret_key': getenv('STORAGE_DBBACKUP_secret_key', 'secret_key'),
+            'bucket_name': getenv('STORAGE_DBBACKUP_bucket_name', 'lmsdbbucket'),
+            'default_acl': getenv('STORAGE_DBBACKUP_default_acl', 'private'),
+            'region_name': getenv('STORAGE_DBBACKUP_region_name', 'nyc3'),
+            'endpoint_url': getenv('STORAGE_DBBACKUP_endpoint_url', 'https://nyc3.digitaloceanspaces.com'),
+        },
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+DBBACKUP_CONNECTORS = {
+    'default': {
+        'USER': getenv('DATABASE_USERNAME', 'lpmsuserdebug'),
+        'PASSWORD': getenv('DATABASE_PASSWORD', 'lpmspassdebug'),
+        'NAME': getenv('DATABASE_NAME', 'lmpsdbdebug'),
+        'HOST': getenv('DATABASE_HOST', '127.0.0.1'),
+        'PORT': getenv('DATABASE_PORT', 5432),
+        'SINGLE_TRANSACTION': getenv("DBBACKUP_SINGLE_TRANSACTION", 'False').lower() in ('true', '1'),
+        'CONNECTOR': getenv('DBBACKUP_CONNECTOR', 'dbbackup.db.postgresql.PgDumpBinaryConnector'),
+    }
+}
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
 SILENCED_SYSTEM_CHECKS = ["security.W019"]

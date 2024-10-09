@@ -15,6 +15,9 @@ from notify.enums import MessageTemplates
 def send_message_handler(
         instance: HomeworkStatus,
         *args: tuple, **kwargs: dict[str, Any]) -> None:
+    if kwargs.get('raw'):
+        # don't call if loaddata from fixtures
+        return
     status = instance.status
     # Student notify
     if status != HomeworkStatuses.available.name:
