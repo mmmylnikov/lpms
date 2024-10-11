@@ -6,6 +6,7 @@ django-admin-interface==0.28.6
 django-dbbackup==4.2.1
 django-storages==1.14.4
 django-extensions==3.2.3
+django-cors-headers==4.4.0
 boto3==1.35.36
 Markdown==3.6
 PyGithub==2.3.0

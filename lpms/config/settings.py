@@ -20,6 +20,8 @@ INTERNAL_IPS = getenv('INTERNAL_IPS', '').split(',')
 
 CSRF_TRUSTED_ORIGINS = getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
+CORS_ALLOWED_ORIGINS = getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+
 INSTALLED_APPS = [
     # Admin interface
     'admin_interface',
@@ -54,6 +56,8 @@ INSTALLED_APPS = [
     'storages',
     # pip install django-extensions
     'django_extensions',
+    # pip install django-cors-headers
+    "corsheaders",
 ]
 
 
@@ -66,6 +70,7 @@ ROOT_URLCONF = 'config.urls'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
