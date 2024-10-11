@@ -182,3 +182,4 @@ dev/
 .github/workflows/deploy.secrets
 assets/
 s3/
+*s3.test
