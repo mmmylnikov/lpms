@@ -183,3 +183,4 @@ dev/
 assets/
 s3/
 *s3.test
+lpms.code-workspace
