@@ -38,6 +38,8 @@ class UserAdmin(ImportExportModelAdmin, BaseUserAdmin):
         'username', 'gh_username', 'tg_username', 'email',
         'first_name', 'last_name',
         )
+    ordering = ('-is_superuser', '-is_admin', '-is_tutor', '-is_active',
+                'last_name', 'first_name', 'username')
 
     @admin.display(description="Github")
     def github_url(self, obj: User) -> str:
