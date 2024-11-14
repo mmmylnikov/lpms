@@ -26,6 +26,9 @@ def send_message_handler(
 
         message += f' на "{status_text}".\n'
         message += f'Задание: `{instance.homework.challenge.name}`'
+        if instance.homework.tutor_comment:
+            message += '\nКомментарий куратора: '
+            message += f'`{instance.homework.tutor_comment}`'
         send_message_homework_status_update(user=instance.student,
                                             message=message)
     # Tutor notify

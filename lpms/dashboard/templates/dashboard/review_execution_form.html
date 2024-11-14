@@ -30,6 +30,7 @@
                     </a>
                 </span>
             </div>
+            
             {% if not status.homework.team.enrollment.is_completed %}
             <div class="d-grid gap-2 mx-auto">
                 {% if status.status == 'review' %}
@@ -39,6 +40,12 @@
                     Работа проверена
                     <div class="htmx-indicator spinner-border spinner-border-sm" role="status"></div>
                 </button> 
+                <div hx-get="{% url 'review_update_view' review.pk%}?status_sending=correction&status_current={{status.status}}&redirect_url={{request.META.HTTP_REFERER}}" 
+                 hx-trigger="load" hx-swap="innerHTML">
+                 <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
                 {% endif %}
             </div>
             {% endif %}

@@ -154,6 +154,8 @@ class Homework(models.Model):
                                   verbose_name='Задание')
     comment = models.TextField(null=True, blank=True,
                                verbose_name='Комментарий')
+    tutor_comment = models.TextField(null=True, blank=True,
+                                     verbose_name='Комментарий куратора')
     repo = models.CharField(max_length=512, null=True, blank=True,
                             validators=[HomeworkRepoValidator()],
                             verbose_name='Репозиторий')

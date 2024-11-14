@@ -23,3 +23,13 @@ class TaskUpdateForm(forms.ModelForm):
     class Meta:
         model = Homework
         fields = ['repo', 'comment', ]
+
+
+class ReviewUpdateForm(forms.ModelForm):
+    tutor_comment = forms.CharField(
+        label='Комментарий к работе (опционально)', required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}))
+
+    class Meta:
+        model = Homework
+        fields = ['tutor_comment', ]
