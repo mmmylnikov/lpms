@@ -160,10 +160,19 @@ class User(AbstractUser):
         return Repo.objects.filter(user=self)
 
     def __str__(self) -> str:
-        output = f'{self.last_name} {self.first_name}'
+        if not self.last_name and not self.first_name:
+            output = self.username
+        else:
+            output = f'{self.last_name} {self.first_name}'
         if self.is_tutor:
             return f'{output} (куратор)'
         return output
 
     def get_absolute_url(self) -> str:
         return reverse_lazy("user_detail_view", kwargs={'slug': self.username})
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ['-is_superuser', '-is_admin', '-is_tutor', '-is_active',
+                    'last_name', 'first_name', 'username']

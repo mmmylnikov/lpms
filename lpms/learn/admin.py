@@ -40,14 +40,15 @@ class ChallengeAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
 class HomeworkAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('updated_at', 'challenge', 'user')
     list_display_links = ('user',)
-    list_filter = ('challenge__track', )
+    list_filter = ('challenge__track', 'user', 'team', 'updated_at',)
     ordering = ('challenge', 'user')
 
 
 class HomeworkStatusAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('updated_at',  'tutor', 'student', 'status', 'homework', )
     list_display_links = ('homework',)
-    list_filter = ('homework__challenge__track', )
+    list_filter = ('homework__challenge__track', 'student', 'tutor', 'status',
+                   'updated_at')
     ordering = ('tutor',  'student', 'updated_at', )
 
 

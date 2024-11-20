@@ -13,7 +13,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 
 from course.models import Team
 from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
-from learn.forms import TaskUpdateForm
+from learn.forms import TaskUpdateForm, ReviewUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta, LearnMeta
 from learn.enums import HomeworkStatuses
 from user.models import Repo, Pull, User
@@ -218,18 +218,27 @@ class StudentTaskView(TaskViewMixin, StudentDashboardView):
             )
             status.save()
             task.save()
+            status_sending = "review"
         else:
             if not task:
                 status = None
+                status_sending = "review"
             else:
                 status = HomeworkStatus.objects.filter(
                     homework=task, student=self.request.user
                 ).first()
+                if not status:
+                    status_sending = "review"
+                elif status.status == HomeworkStatuses.approved.name:
+                    status_sending = "approved"
+                else:
+                    status_sending = "review"
+
         context.update(
             {
                 "task": task,
                 "status": status,
-                "status_sending": "review",
+                "status_sending": status_sending,
             }
         )
         return context
@@ -264,6 +273,7 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         repo_isreadonly = status.status not in [
             HomeworkStatuses.available.name,
             HomeworkStatuses.execution.name,
+            HomeworkStatuses.correction.name,
         ]
         if self.request.method == "GET" and repo_isreadonly:
             form.fields["repo"].widget.attrs.update(
@@ -273,6 +283,58 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                     "ссылку после отправки",
                 }
             )
+        context.update(
+            {
+                "status_sending": self.request.GET.get("status_sending"),
+                "status_current": self.request.GET.get("status_current"),
+                "status": status,
+            }
+        )
+        return context
+
+    def post(
+        self, request: HttpRequest, *args: str, **kwargs: reverse_lazy
+    ) -> HttpResponse:
+        status_sending = self.request.POST.get("status_sending")
+        if self.request.POST.get("status_sending") == "available":
+            self.set_obj_status(status=status_sending)
+            return redirect(self.get_success_url())
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        response = super().form_valid(form)
+        status_sending = self.request.POST.get("status_sending")
+        status_current = self.request.GET.get("status_current")
+        if status_sending != status_current:
+            self.set_obj_status(status=status_sending)
+        return response
+
+
+class ReviewUpdateView(LoginRequiredMixin, UpdateView):
+    model = Homework
+    form_class = ReviewUpdateForm
+    template_name = "dashboard/review_update_form.html"
+
+    def set_obj_status(self, status: str | None) -> Homework:
+        obj: Homework = self.get_object()
+        if isinstance(self.request.user, AnonymousUser):
+            return obj
+        if not status:
+            return obj
+        HomeworkStatus(
+            student=obj.user,
+            tutor=obj.team.tutor,
+            status=status,
+            homework=obj,
+        ).save()
+        return obj
+
+    def get_success_url(self) -> str:
+        return reverse_lazy("task_update_success")
+
+    def get_context_data(self, **kwargs: reverse_lazy) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        status = self.get_object().homeworkstatus_set.first()
         context.update(
             {
                 "status_sending": self.request.GET.get("status_sending"),
