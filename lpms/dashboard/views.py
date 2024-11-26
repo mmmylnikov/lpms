@@ -138,9 +138,21 @@ class AdminDashboardStatsView(LoginRequiredMixin, TemplateView):
             .get_teams()
             .get_admin_stats(status=self.status)
         )
-        context.update({
-            "learn_meta": learn_meta,
-            "homework_status": self.status})
+        last_activity_homework = (
+            HomeworkStatus.objects.all()
+            .select_related(
+                "student", "tutor",
+                "homework__challenge", "homework__team__enrollment",
+                "homework__team__enrollment__course")
+            .order_by("-updated_at")[:10]
+        )
+        context.update(
+            {
+                "learn_meta": learn_meta,
+                "homework_status": self.status,
+                "last_activity_homework": last_activity_homework,
+            }
+        )
         return context
 
 
