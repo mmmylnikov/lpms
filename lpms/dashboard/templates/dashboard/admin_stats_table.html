@@ -39,11 +39,11 @@
                     <table class="table table-striped table-hover table-sm">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col"> {{homework_status.value.label_action_tutor}}</th>
-                                <th scope="col">Поток</th>
-                                <th scope="col">Студент</th>
-                                <th scope="col">Работа</th>
+                                <th scope="col" class="col-1">#</th>
+                                <th scope="col" class="col-3">{{homework_status.value.label_action_tutor}}</th>
+                                <th scope="col" class="col-1">Поток</th>
+                                <th scope="col" class="col-2">Студент</th>
+                                <th scope="col" class="col-5">Работа</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,8 +52,18 @@
                                 <th scope="row">{{ forloop.counter }}</th>
                                 <td>{{ review.updated_at|naturaltime }}</td>
                                 <td>{{ review.homework.team.enrollment.slug }}</td>
-                                <td>{{ review.student.first_name }} {{ review.student.last_name }}</td>
+                                <td>{{ review.student }}</td>
                                 <td>
+                                    {% if review.homework.tutor_comment %}
+                                    <a type="button" 
+                                        class="btn btn-outline-secondary btn-sm"
+                                        data-bs-container="body" 
+                                        data-bs-toggle="popover"
+                                        data-bs-placement="top"
+                                        data-bs-content="{{review.homework.tutor_comment | linebreaks}}">
+                                        <i class="bi bi-chat-left-dots"></i>
+                                    </a>
+                                    {% endif %}
                                     {{review.homework.challenge.name }}
                                 </td>
                             </tr>

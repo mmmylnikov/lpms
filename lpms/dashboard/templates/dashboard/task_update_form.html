@@ -19,7 +19,8 @@
 
     {% if status.homework.tutor_comment %}
     <div class="alert alert-warning" role="alert">
-        Комментарий куратора: {{status.homework.tutor_comment}}
+        <b>Комментарий куратора:</b>
+        {{status.homework.tutor_comment | linebreaks}}
       </div>
     {% endif %}
     
