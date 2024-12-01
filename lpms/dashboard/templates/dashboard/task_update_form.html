@@ -59,12 +59,13 @@
     <div class="mb-3">
         <label for="InputComment" class="form-label">{{ form.comment.label }}</label>
         {{ form.comment }}
-        {% if request.method == 'POST' %}
         <div id="commentHelp" class="form-text">
-            Напишите что-нибудь важное к выполнению, например, что бы хотели обсудить на созвоне 
-            (это поле только для вас - куратор его не увидит)
+            Напишите что-нибудь важное к выполнению. Например, что бы хотели обсудить на созвоне 
+            (это поле только для вас - куратор его не увидит). 
+            <br>
+            Если все-таки нужно что-нибудь сообщить куратору, касаемо вашей работы, 
+            то делайте комментарий прямо в пулл-реквесте на GitHub.
         </div>
-        {% endif %}
         <div class="text-end mt-3">
             {% if status.status == 'execution' %}
             <button type="submit" class="btn btn-danger btn-sm" name='status_sending' value="available" formnovalidate="TaskUpdateForm">Отменить выполнение</button>
