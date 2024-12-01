@@ -12,6 +12,8 @@ SHARED_ROOT = BASE_DIR / 'shared'
 
 SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 
+SITE_REPAIR = getenv("SITE_REPAIR", 'False').lower() in ('true', '1')
+
 DEBUG = getenv("DEBUG", 'False').lower() in ('true', '1')
 
 ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
@@ -74,6 +76,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'course.middleware.SuperuserDebugMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",

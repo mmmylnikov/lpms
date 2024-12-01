@@ -1,0 +1,27 @@
+{% extends "dashboard_fullscreen.html" %}
+
+
+{% block head_title %}
+    Опаньки ...
+{% endblock head_title %}
+
+{% block panel %}
+
+<div class="row">
+    <div class="col">
+        <h1>
+            Опаньки ... 
+            {% if status_code %}
+            | {{ status_code }}
+            {% endif %}
+        </h1>
+        {% if status_text %}
+        <hr>
+        <h2 class="fw-light">
+            {{ status_text }}
+        </h2>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock panel %}
