@@ -1,35 +1,52 @@
-<form method="post" id="TaskUpdateForm" 
-      hx-post="{% url 'review_update_view' homework.pk %}?status_sending={{status_sending}}&status_current={{status_current}}&redirect_url={{request.GET.redirect_url}}">
-    {% csrf_token %}
+<div class="accordion accordion-flush pb-1" id="accordionReviewUpdate">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#ReviewUpdate-collapseOne" aria-expanded="true" aria-controls="ReviewUpdate-collapseOne">
+          Изменить статус работы вручную
+        </button>
+      </h2>
+      <div id="ReviewUpdate-collapseOne" class="accordion-collapse collapse">
+        <div class="accordion-body">
+            <form method="post" id="TaskUpdateForm" 
+                hx-post="{% url 'review_update_view' homework.pk %}?status_sending={{status_sending}}&status_current={{status_current}}&redirect_url={{request.GET.redirect_url}}">
+                {% csrf_token %}
 
-    {% if status.homework.team.enrollment.is_completed %}
-    <div class="alert alert-warning" role="alert">
-        <span>Прием и проверка заданий по этому курсу закончена</span>
-    </div>
-    {% endif %}
+                {% if status.homework.team.enrollment.is_completed %}
+                <div class="alert alert-warning" role="alert">
+                    <span>Прием и проверка заданий по этому курсу закончена</span>
+                </div>
+                {% endif %}
 
-    {% if request.method == 'POST' %}
-    {% if form.errors %}
-    <div class="alert alert-danger" role="alert">
-        <span>Не удалось отправить задание!</span>
-    </div>
-    {% endif %}
-    {% endif %}
+                {% if request.method == 'POST' %}
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                    <span>Не удалось отправить задание!</span>
+                </div>
+                {% endif %}
+                {% endif %}
 
-    <div class="mb-3">
-        <label for="InputTutorComment" class="form-label">{{ form.tutor_comment.label }}</label>
-        {{ form.tutor_comment }}
-        
-        <div class="text-end mt-3">
- 
-            {% if not status.homework.team.enrollment.is_completed %}
-            {% if status.status == 'review' %}
-            <button type="submit" class="btn btn-warning btn-sm" name='status_sending' value="{{status_sending}}" >
-                Отправить на доработку 
-            </button>
-            {% endif %}
-            {% endif %}
+                <div class="mb-3">
+                    <label for="InputTutorComment" class="form-label">{{ form.tutor_comment.label }}</label>
+                    {{ form.tutor_comment }}
+                    
+                    <div class="text-end mt-3">
+            
+                        {% if not status.homework.team.enrollment.is_completed %}
+                        {% if status.status == 'review' or status.status == 'approved' %}
+                        <button type="submit" class="btn btn-outline-success btn-sm" name='status_sending' value="approved" >
+                            Отметить принятой
+                        </button>
+                        <button type="submit" class="btn btn-warning btn-sm" name='status_sending' value="correction" >
+                            Отправить на доработку 
+                        </button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
         </div>
+      </div>
     </div>
-</form>
+</div>
 

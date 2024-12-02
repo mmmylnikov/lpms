@@ -12,6 +12,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 
 
 from course.models import Team
+from course.views import handler_500_view
 from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm, ReviewUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta, LearnMeta
@@ -242,7 +243,7 @@ class StudentTaskView(TaskViewMixin, StudentDashboardView):
                 if not status:
                     status_sending = "review"
                 elif status.status == HomeworkStatuses.approved.name:
-                    status_sending = "approved"
+                    status_sending = "review"
                 else:
                     status_sending = "review"
 
@@ -282,10 +283,8 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         form = context["form"]
         status = self.get_object().homeworkstatus_set.first()
-        repo_isreadonly = status.status not in [
-            HomeworkStatuses.available.name,
-            HomeworkStatuses.execution.name,
-            HomeworkStatuses.correction.name,
+        repo_isreadonly = status.status in [
+            HomeworkStatuses.review.name,
         ]
         if self.request.method == "GET" and repo_isreadonly:
             form.fields["repo"].widget.attrs.update(
@@ -316,9 +315,15 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)
         status_sending = self.request.POST.get("status_sending")
-        status_current = self.request.GET.get("status_current")
-        if status_sending != status_current:
-            self.set_obj_status(status=status_sending)
+        student_comment = self.request.POST.get("student_comment")
+        if status_sending:
+            status_current = self.request.GET.get("status_current")
+            if status_sending != status_current:
+                self.set_obj_status(status=status_sending)
+        elif student_comment:
+            pass
+        else:
+            response = handler_500_view(request=self.request)
         return response
 
 
@@ -469,12 +474,18 @@ class TutorReviewCheckView(TemplateView):
         context = super().get_context_data(**kwargs)
         review = Homework.objects.get(pk=self.kwargs["review_id"])
         status = HomeworkStatus.objects.get(pk=self.kwargs["status_id"])
-        if status.status != HomeworkStatuses.review.name:
+        # check correct current homework status
+        if status.status == HomeworkStatuses.approved.name:
             context.update({"new_status": None, "reason": "already_review"})
             return context
+        elif status.status != HomeworkStatuses.review.name:
+            context.update({"new_status": None, "reason": "is_not_review"})
+            return context
+        # check correct not empty repo url
         if not review.repo:
             context.update({"new_status": None, "reason": "repo_isnotvalid"})
             return context
+        # check status pr on github
         github_pr_status = self.__get_github_pr_status(
             pr_url=review.repo,
             tutor_github_login=self.kwargs["tutor_github_login"],
@@ -484,7 +495,9 @@ class TutorReviewCheckView(TemplateView):
             context.update({"new_status": new_status})
             return context
         elif github_pr_status == HomeworkStatuses.correction:
-            new_status = self.__add_status(status, HomeworkStatuses.correction)
+            new_status = self.__add_status(
+                status, HomeworkStatuses.correction
+                )
             context.update({"new_status": new_status})
             return context
         else:

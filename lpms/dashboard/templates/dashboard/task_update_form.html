@@ -72,13 +72,14 @@
             {% endif %}
             
             {% if not status.homework.team.enrollment.is_completed %}
-            <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="{{status_sending}}" >
-                {% if status.status == 'execution' or status.status == 'available' or status.status == 'correction' %}
-                Отправить на проверку
-                {% else %}
-                Обновить комментарий
+                {% if status.status != 'review' %}
+                <button type="submit" class="btn btn-warning btn-sm" name='student_comment' value="update" >
+                    Обновить комментарий                 
+                </button>
+                <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="review" >
+                    Отправить на проверку                    
+                </button>
                 {% endif %}
-            </button>
             {% endif %}
         </div>
     </div>
