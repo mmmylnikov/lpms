@@ -12,6 +12,8 @@ SHARED_ROOT = BASE_DIR / 'shared'
 
 SECRET_KEY = getenv('DJANGO_SECRET_KEY')
 
+SITE_REPAIR = getenv("SITE_REPAIR", 'False').lower() in ('true', '1')
+
 DEBUG = getenv("DEBUG", 'False').lower() in ('true', '1')
 
 ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(',')
@@ -70,10 +72,11 @@ ROOT_URLCONF = 'config.urls'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'course.middleware.SuperuserDebugMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
@@ -169,13 +172,23 @@ DBBACKUP_STORAGE_OPTIONS = {
 
 # STATIC SETTINGS
 
-STATICFILES_STORAGE = 'backends.storages.PublicStaticStorage'
+STORAGE_STATIC_BACKEND = getenv('STORAGE_STATIC_BACKEND', 's3').lower()
 
-STORAGE_STATIC_S3_CUSTOM_DOMAIN = getenv('STORAGE_STATIC_S3_CUSTOM_DOMAIN', None)
+if STORAGE_STATIC_BACKEND == 's3':
 
-STORAGE_STATIC_LOCATION = getenv('STORAGE_STATIC_LOCATION', 'static')
+    STATICFILES_STORAGE = 'backends.storages.PublicStaticStorage'
 
-STATIC_URL = f'{STORAGE_STATIC_S3_CUSTOM_DOMAIN}/{STORAGE_STATIC_LOCATION}/'
+    STORAGE_STATIC_S3_CUSTOM_DOMAIN = getenv('STORAGE_STATIC_S3_CUSTOM_DOMAIN', None)
+
+    STORAGE_STATIC_LOCATION = getenv('STORAGE_STATIC_LOCATION', 'static')
+
+    STATIC_URL = f'{STORAGE_STATIC_S3_CUSTOM_DOMAIN}/{STORAGE_STATIC_LOCATION}/'
+
+else:
+
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+    STATIC_URL = 'static/'
 
 STATIC_ROOT = SHARED_ROOT / 'static'
 
@@ -186,13 +199,21 @@ STATICFILES_DIRS = [
 
 # MEDIA SETTINGS
 
-DEFAULT_FILE_STORAGE = 'backends.storages.PublicMediaStorage'
+STORAGE_MEDIA_BACKEND = getenv('STORAGE_MEDIA_BACKEND', 's3').lower()
 
-STORAGE_MEDIA_S3_CUSTOM_DOMAIN = getenv('STORAGE_MEDIA_S3_CUSTOM_DOMAIN', None)
+if STORAGE_MEDIA_BACKEND == 's3':
 
-STORAGE_MEDIA_LOCATION = getenv('STORAGE_MEDIA_LOCATION', 'media')
+    DEFAULT_FILE_STORAGE = 'backends.storages.PublicMediaStorage'
 
-MEDIA_URL = f'{STORAGE_MEDIA_S3_CUSTOM_DOMAIN}/{STORAGE_MEDIA_LOCATION}/'
+    STORAGE_MEDIA_S3_CUSTOM_DOMAIN = getenv('STORAGE_MEDIA_S3_CUSTOM_DOMAIN', None)
+
+    STORAGE_MEDIA_LOCATION = getenv('STORAGE_MEDIA_LOCATION', 'media')
+
+    MEDIA_URL = f'{STORAGE_MEDIA_S3_CUSTOM_DOMAIN}/{STORAGE_MEDIA_LOCATION}/'
+
+else:
+
+    MEDIA_URL = 'media/'
 
 MEDIA_ROOT = SHARED_ROOT / 'media'
 

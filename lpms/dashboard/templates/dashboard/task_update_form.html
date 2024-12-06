@@ -19,7 +19,8 @@
 
     {% if status.homework.tutor_comment %}
     <div class="alert alert-warning" role="alert">
-        Комментарий куратора: {{status.homework.tutor_comment}}
+        <b>Комментарий куратора:</b>
+        {{status.homework.tutor_comment | linebreaks}}
       </div>
     {% endif %}
     
@@ -58,25 +59,27 @@
     <div class="mb-3">
         <label for="InputComment" class="form-label">{{ form.comment.label }}</label>
         {{ form.comment }}
-        {% if request.method == 'POST' %}
         <div id="commentHelp" class="form-text">
-            Напишите что-нибудь важное к выполнению, например, что бы хотели обсудить на созвоне 
-            (это поле только для вас - куратор его не увидит)
+            Напишите что-нибудь важное к выполнению. Например, что бы хотели обсудить на созвоне 
+            (это поле только для вас - куратор его не увидит). 
+            <br>
+            Если все-таки нужно что-нибудь сообщить куратору, касаемо вашей работы, 
+            то делайте комментарий прямо в пулл-реквесте на GitHub.
         </div>
-        {% endif %}
         <div class="text-end mt-3">
             {% if status.status == 'execution' %}
             <button type="submit" class="btn btn-danger btn-sm" name='status_sending' value="available" formnovalidate="TaskUpdateForm">Отменить выполнение</button>
             {% endif %}
             
             {% if not status.homework.team.enrollment.is_completed %}
-            <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="{{status_sending}}" >
-                {% if status.status == 'execution' or status.status == 'available' or status.status == 'correction' %}
-                Отправить на проверку
-                {% else %}
-                Обновить комментарий
+                {% if status.status != 'review' %}
+                <button type="submit" class="btn btn-warning btn-sm" name='student_comment' value="update" >
+                    Обновить комментарий                 
+                </button>
+                <button type="submit" class="btn btn-success btn-sm" name='status_sending' value="review" >
+                    Отправить на проверку                    
+                </button>
                 {% endif %}
-            </button>
             {% endif %}
         </div>
     </div>

@@ -138,7 +138,11 @@ class Week(models.Model):
         return ', '.join(output)
 
     def __str__(self) -> str:
-        return f'{self.course} #{self.number}'
+        date_change = "_".join([
+            self.created_at.strftime("%Y%m%d"),
+            self.updated_at.strftime("%Y%m%d"),
+        ])
+        return f'{date_change} | {self.course.slug} #{self.number}'
 
     class Meta:
         verbose_name = 'Неделя'

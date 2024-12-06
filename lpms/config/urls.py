@@ -6,6 +6,13 @@ from django.views.generic.base import TemplateView
 from config import settings
 
 
+handler400 = 'course.views.handler_400_view'
+handler403 = 'course.views.handler_403_view'
+handler404 = 'course.views.handler_404_view'
+handler500 = 'course.views.handler_500_view'
+handler503 = 'course.views.handler_503_view'
+
+
 urlpatterns = [
     re_path(r"^accounts/", include("allauth.urls")),
     path('', include('course.urls')),

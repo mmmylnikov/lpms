@@ -15,10 +15,54 @@
             <ul class="list-group list-group-flush list-group-numbered m-0">
                 <li class="list-group-item">Откройте пулл-реквест по ссылке</li>
                 <li class="list-group-item">Проверьте работу в соответствии с заданием</li>
-                <li class="list-group-item">Оставьте комментарии к выполнению</li>
+                <li class="list-group-item">Оставьте комментарии к выполнению (в пулл-реквесте на GitHub)</li>
                 <li class="list-group-item">Если работа выполнена и не требует замечаний - сделайте аппрув</li>
                 <li class="list-group-item">Нажмите ниже кнопку "Работа проверена"</li>
             </ul>
+            <hr>
+            <div class="accordion accordion-flush" id="accordionTutorReviewHelp">
+                <div class="accordion-item ">
+                  <h2 class="accordion-header ">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            <span class="badge text-bg-warning">?</span>
+                            <span class="ms-1">Что произойдет после нажатия кнопки "Работа проверена"? </span>
+                    </button>
+                  </h2>
+                  <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionTutorReviewHelp">
+                    <div class="accordion-body">
+                        LMS проверит статус вашего комментария к пулл-реквесту за последним коммитом:
+                        <ul>
+                            <li>если пулл-реквест содержит комментарии типа "reviewed" - работа будет отправлена на устранение замечаний;</li>
+                            <li>если пулл-реквест имеет комментарий типа "approved" - работа будет считаться принятой;</li>
+                            <li>если вы не оставили не один комментарий - lms попросит это сделать.</li>
+                        </ul>
+                    </div>
+                   </div>
+                </div>
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            <span class="badge text-bg-warning">?</span>
+                            <span class="ms-1">Можно ли вручную отправить работу на устранение замечаний или отметить принятой?</span>
+                    </button>
+                  </h2>
+                  <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionTutorReviewHelp">
+                    <div class="accordion-body">
+                        Да, можно. Для этого есть кнопки "Отправить на доработку" и "Принять работу".
+                        <ul>
+                            <li>Отправить на доработу нужно, например, если ссылка на пулл-реквест неверная.</li>
+                            <li>Также к примеру, можно на гитхабе оставить статус "approved", а задание отправить на доработку, 
+                                если к примеру работа не имеет неверных решений, но может быть доработана, чтобы отточить тот или иной навык.
+                            </li>
+                            <li>Если по каким то причинам необходимо задание отметить принятым, без проверки статуса работы на гитхабе.</li>
+                        </ul>
+                        Опционально, при ручном изменении статуса работы можно указать причину в поле "Комментарий".
+                    </div>
+                  </div>
+                </div>
+            </div>
         </p>                
     </div>
 </div>

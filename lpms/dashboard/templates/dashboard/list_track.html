@@ -1,16 +1,26 @@
 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     {% for t in learn_meta.tracks %}
     <li class="nav-item" role="presentation">
-      <button class="nav-link
+      <button type="button" class="btn btn-outline-primary d-flex align-items-center justify-content-start p-2 me-1
               {% if forloop.counter == 1 %}
                 active
               {% endif %}
-      
-              " id="pills-{{ forloop.counter }}-tab" 
+              " 
+              id="pills-{{ forloop.counter }}-tab" 
               data-bs-toggle="pill" 
               data-bs-target="#pills-{{ forloop.counter }}" 
               type="button" role="tab" aria-controls="pills-{{ forloop.counter }}" aria-selected="true">
-        {{ t.name }}
+              {% for trc, lessons in learn_meta.week_lessons.items %}
+                {% if trc == t and lessons %}
+                <span class="badge text-bg-warning ms-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Уроков: {{ lessons|length }}"><i class="bi bi-journal-text"></i></span>
+                {% endif %}
+              {% endfor %}
+              {% for trc, challenges in learn_meta.week_challenges.items %}
+                {% if trc == t and challenges %}
+                <span class="badge text-bg-danger ms-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Заданий: {{ challenges|length }}"><i class="bi bi-journal-code"></i></span>
+                {% endif %}
+              {% endfor %}
+              <span class="ms-2">{{ t.name }} </span>
       </button>
     </li>
     {% endfor%}
