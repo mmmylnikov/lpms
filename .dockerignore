@@ -43,3 +43,4 @@ lpms/.mypy_cache/
 lpms/.DS_Store
 assets/
 s3/
+lpms/static/lessons/
