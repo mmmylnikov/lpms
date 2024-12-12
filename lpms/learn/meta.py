@@ -386,6 +386,7 @@ class StudentLearnMeta(LearnMeta):
 class TutorLearnMeta(StudentLearnMeta):
     # review
     students: dict[User, SocialAccount]
+    students_unpermitted: list[User]
     week_reviews: (
         dict[User, list[tuple[Homework | None, HomeworkStatus | None]]] | None
     ) = None
@@ -398,10 +399,14 @@ class TutorLearnMeta(StudentLearnMeta):
         self.get_week_reviews()
 
     def get_students(self) -> None:
+        students_unpermitted = list(self.team.students.all())
         accounts = SocialAccount.objects.filter(
-            user__in=list(self.team.students.all())
+            user__in=students_unpermitted
         ).select_related("user")
         self.students = {account.user: account for account in accounts}
+        for student in self.students:
+            students_unpermitted.remove(student)
+        self.students_unpermitted = students_unpermitted
 
     def get_week_reviews(self) -> None:
         if isinstance(self.user, AnonymousUser):
