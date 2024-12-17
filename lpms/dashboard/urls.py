@@ -7,7 +7,9 @@ from dashboard.views import (StudentDashboardView, StudentTaskView,
                              TaskUpdateView, ReviewUpdateView,
                              TutorReviewCheckView,
                              TutorDashboardStatsView,
+                             TutorDashboardProgressView,
                              AdminDashboardStatsView,
+                             AdminDashboardProgressView,
                              )
 from learn.enums import HomeworkStatuses
 
@@ -31,6 +33,9 @@ urlpatterns = [
      path('review/stats/execution/',
           TutorDashboardStatsView.as_view(status=HomeworkStatuses.execution),
           name='tutor_dashboard_stats_execution_view'),
+     path('review/tutor_stats/progress/',
+          TutorDashboardProgressView.as_view(),
+          name='tutor_dashboard_progress_view'),
 
      # dashboard: analytics for admin
      path('review/admin_stats/review/',
@@ -42,6 +47,9 @@ urlpatterns = [
      path('review/admin_stats/execution/',
           AdminDashboardStatsView.as_view(status=HomeworkStatuses.execution),
           name='admin_dashboard_stats_execution_view'),
+     path('review/admin_stats/progress/',
+          AdminDashboardProgressView.as_view(),
+          name='admin_dashboard_progress_view'),
 
      # dashboard: task (execution and review)
      path('learn/week/<int:week_number>/team/<slug:team_slug>/'

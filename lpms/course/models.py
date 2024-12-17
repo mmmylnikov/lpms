@@ -104,6 +104,9 @@ class Track(models.Model):
     def __str__(self) -> str:
         return f'{self.course.slug} - {self.name}'
 
+    def slug(self) -> str:
+        return f"{''.join([s[0].upper() for s in self.name.split(' ')])}"
+
     class Meta:
         verbose_name = 'Трек'
         verbose_name_plural = 'Треки'

@@ -23,4 +23,12 @@
             Невыполненные задания
         </a>
       </div>
+      <div class="list-group list-group-flush">
+        <a href="{% url 'tutor_dashboard_progress_view' %}"
+           class="list-group-item list-group-item-action
+                 {% if status == 'progress' %}bg-primary-subtle{% endif %}">
+                 <i class="bi bi-stars"></i>
+            Прогресс обучения
+        </a>
+      </div>
 </div>

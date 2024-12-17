@@ -157,6 +157,38 @@ class AdminDashboardStatsView(LoginRequiredMixin, TemplateView):
         return context
 
 
+class AdminDashboardProgressView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/admin_progress.html"
+    status = 'progress'
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        learn_meta = (
+            LearnMeta(user=self.request.user)
+            .get_teams()
+            .get_admin_progress()
+        )
+        context.update({"status": self.status, "learn_meta": learn_meta})
+        return context
+
+
+class TutorDashboardProgressView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/tutor_progress.html"
+    status = 'progress'
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        if isinstance(self.request.user, AnonymousUser):
+            return context
+        learn_meta = (
+            LearnMeta(user=self.request.user)
+            .get_teams()
+            .get_admin_progress(tutor=self.request.user)
+        )
+        context.update({"status": self.status, "learn_meta": learn_meta})
+        return context
+
+
 class ContentView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard/content.html"
 
