@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 from django.urls import reverse_lazy
 from learn.models import Homework
@@ -19,6 +21,20 @@ class TaskUpdateForm(forms.ModelForm):
     comment = forms.CharField(label='Комментарий', required=False,
                               widget=forms.Textarea(
                                   attrs={'class': 'form-control', 'rows': 2}))
+
+    def clean(self) -> dict[str, Any] | None:
+        cleaned_data = super().clean()
+        if not cleaned_data:
+            return None
+        repo = cleaned_data.get('repo')
+        if not repo:
+            return cleaned_data
+        validation_error = self.instance.pull_request_policy_validator(
+            pr_url=repo
+        )
+        if validation_error:
+            self.add_error('repo', validation_error)
+        return cleaned_data
 
     class Meta:
         model = Homework

@@ -10,13 +10,12 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 
-
 from course.models import Team
 from course.views import handler_500_view
 from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm, ReviewUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta, LearnMeta
-from learn.enums import HomeworkStatuses
+from learn.enums import HomeworkStatuses, PullRequestPolicies
 from user.models import Repo, Pull, User
 from user.utils import GithubApi
 
@@ -331,6 +330,9 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                 "status_sending": self.request.GET.get("status_sending"),
                 "status_current": self.request.GET.get("status_current"),
                 "status": status,
+                "pr_policy": PullRequestPolicies[
+                    self.get_object().challenge.pull_request_policy
+                ],
             }
         )
         return context
