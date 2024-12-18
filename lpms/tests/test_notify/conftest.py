@@ -6,9 +6,7 @@ from notify.providers import TelegramBot
 
 @pytest.fixture
 def telegram_bot():
-    tgbot = TelegramBot()
-    tgbot.token = 'token'
-    return tgbot
+    return TelegramBot(token='token')
 
 
 @pytest.fixture
