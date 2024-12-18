@@ -18,6 +18,33 @@ jobs:
       - name: Install requirements
         run: pip install -r lpms/requirements_dev.txt
       - name: Run flake8
-        run: flake8 .
+        run: make style
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'  
+      - name: Install requirements
+        run: pip install -r lpms/requirements_dev.txt
       - name: Run mypy
-        run: mypy .
+        run: make types
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12']
+    needs: [lint, types]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }} 
+      - name: Install requirements
+        run: pip install -r lpms/requirements_dev.txt
+      - name: Run tests
+        run: make pytest

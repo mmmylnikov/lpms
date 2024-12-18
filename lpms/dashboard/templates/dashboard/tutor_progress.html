@@ -1,0 +1,22 @@
+{% extends "dashboard_panels.html" %}
+
+{% block head_title %}
+Аналитика кураторов
+{% endblock head_title %}
+
+{% block leftpanel %}
+<div class="row">
+    <div class="col">
+        {% include 'user/list_teams_review.html' %}
+        {% include 'dashboard/list_tutor_stats.html' %}
+    </div>
+</div>
+{% endblock %}
+
+{% block rightpanel %}
+<div class="row">
+    <div class="col">
+        {% include 'dashboard/tutor_progress_table.html' %}
+    </div>
+</div>
+{% endblock %}

@@ -1,17 +1,35 @@
+from typing import Any
+
 from django.db import models
 from django.urls import reverse_lazy
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 from markdown import markdown
+from allauth.socialaccount.models import SocialAccount
 
 from user.models import User
 from course.models import Track, Course, Enrollment, Team
-from learn.enums import HomeworkStatuses
+from learn.enums import HomeworkStatuses, PullRequestPolicies
+
+
+def parse_pull_request_url(url: str) -> dict[str, Any]:
+    if not url.startswith('https://github.com'):
+        raise ValidationError(f'Неверный URL: {url}')
+    url_items = url.split('/')
+    output: dict[str, Any] = {}
+    if len(url_items) >= 4:
+        output['username'] = url_items[3]
+    if len(url_items) >= 5:
+        output['repo_name'] = url_items[4]
+    if len(url_items) >= 7:
+        output['pull_num'] = int(url_items[6])
+    return output
 
 
 class HomeworkRepoValidator(RegexValidator):
     regex = (r'https:\/\/github.com'
              r'\/[a-zA-Z0-9-_]*\/[a-zA-Z0-9-_]*'
-             r'\/pull\/[0-9]*')
+             r'\/pull\/[1-9][0-9]*')
     message = ('URL пулл-реквеста должен иметь формат '
                '"https://github.com/<username>/<repo_name>/pull/<pull_num>"')
     code = "invalid_url"
@@ -72,6 +90,10 @@ class Lesson(models.Model):
 
 
 class Challenge(models.Model):
+    pr_choices = (
+        (policy.value.name, policy.value.label)
+        for policy in PullRequestPolicies
+    )
     track = models.ForeignKey(Track, on_delete=models.PROTECT,
                               verbose_name='Трек')
     name = models.CharField(max_length=128, verbose_name='Название')
@@ -81,6 +103,12 @@ class Challenge(models.Model):
     url = models.CharField(max_length=512, null=True, blank=True,
                            verbose_name='Ссылка')
     order = models.PositiveSmallIntegerField(verbose_name='Порядок', default=0)
+    pull_request_policy = models.CharField(
+        max_length=32,
+        choices=pr_choices,
+        default=PullRequestPolicies.own_repo.value.name,
+        verbose_name="Политика пулл-реквестов",
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлен')
 
@@ -187,6 +215,44 @@ class Homework(models.Model):
             'challenge_id': self.challenge.pk,
             'username': self.user.username,
             })
+
+    def pull_request_policy_validator(
+        self, pr_url: str
+    ) -> None | ValidationError:
+        challenge = self.challenge
+        pr_policy = PullRequestPolicies[challenge.pull_request_policy]
+
+        if pr_policy == PullRequestPolicies.any_repo:
+            return None
+        if pr_policy == PullRequestPolicies.any_repo_except_task:
+            if not challenge.repo:
+                return None
+            task_repo = parse_pull_request_url(challenge.repo)
+            pr_repo = parse_pull_request_url(pr_url)
+            if not task_repo.get('username'):
+                return None
+            if all([
+                task_repo['username'] == pr_repo['username'],
+            ]):
+                bad_repo_path = pr_policy.value.url_pattern.format(
+                    username=task_repo['username'],
+                )
+                msg = f'Разрешено использовать: "{pr_policy.value.label}".'
+                msg += f'\nНельзя: {bad_repo_path}'
+                return ValidationError(msg, code='invalid_url')
+            return None
+        if pr_policy == PullRequestPolicies.own_repo:
+            pr_repo = parse_pull_request_url(pr_url)
+            gh_user: SocialAccount = self.user.github_account
+            gh_username = gh_user.extra_data['login']
+            if gh_username != pr_repo['username']:
+                good_repo_path = pr_policy.value.url_pattern.format(
+                    username=gh_username,
+                )
+                msg = f'Разрешено использовать: "{pr_policy.value.label}".'
+                msg += f'\nМожно: {good_repo_path}'
+                return ValidationError(msg, code="invalid_url")
+            return None
 
     class Meta:
         verbose_name = 'Работа'

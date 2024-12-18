@@ -14,8 +14,11 @@ class TelegramBot:
     ssl_context: ssl.SSLContext
     updates: list[dict] | None
 
-    def __init__(self) -> None:
-        self.set_token()
+    def __init__(self, token: str | None = None) -> None:
+        if token:
+            self.token = token
+        else:
+            self.set_token()
         self.set_api_url()
         self.ssl_context = ssl.SSLContext()
 

@@ -1,6 +1,15 @@
+{% load static %}
+
 <div class="card mb-3">
     <div class="card-header">
-        Студенты
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            Студенты
+            <div>
+                {% if learn_meta.students_unpermitted %}
+                <span class="badge text-bg-danger">{{learn_meta.students_unpermitted|length }}</span>
+                {% endif %}
+            </div>
+        </li>
     </div>
     <div class="list-group list-group-flush">
         {% for student, github_account in learn_meta.students.items %}
@@ -9,6 +18,14 @@
                             class="rounded border">
                 {{student.get_full_name}}
                 <small class="fw-lighter"> | {{student.username}}</small>
+            </a>
+        {% endfor %}
+        {% for student in learn_meta.students_unpermitted %}
+            <a href="{% url 'user_detail_view' student.username %}" class="list-group-item list-group-item-action bg-danger-subtle">
+                <img src="{% static 'placeholders/user2.png' %}" alt="mdo" width="32" height="32"
+                            class="rounded ">
+                {{student}}
+                <small class="fw-lighter"> | GitHub не привязан</small>
             </a>
         {% endfor %}
       </div>

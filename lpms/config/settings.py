@@ -60,7 +60,25 @@ INSTALLED_APPS = [
     'django_extensions',
     # pip install django-cors-headers
     "corsheaders",
+    # pip install django-health-check
+    'health_check',
+    'health_check.db',
+    'health_check.cache',
+    # 'health_check.storage',
+    # 'health_check.contrib.s3boto3_storage',
+    'health_check.contrib.migrations',
+    'health_check.contrib.psutil',
 ]
+
+
+HEALTH_CHECK = {
+    'DISK_USAGE_MAX': int(getenv('HEALTH_CHECK_DISK_USAGE_MAX', '90')),
+    'MEMORY_MIN': int(getenv('HEALTH_CHECK_MEMORY_MIN', '200')),
+}
+
+HEALTH_CHECK_TOKEN = getenv('HEALTH_CHECK_TOKEN', '')
+HEALTH_CHECK_STATIC_FILE = getenv('HEALTH_CHECK_STATIC_FILE', 'healthcheck/test.txt')
+HEALTH_CHECK_MEDIA_FILE = getenv('HEALTH_CHECK_MEDIA_FILE', 'healthcheck/test.txt')
 
 
 # ROUTING

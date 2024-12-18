@@ -10,13 +10,12 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 
-
 from course.models import Team
 from course.views import handler_500_view
 from learn.models import Lesson, Challenge, Track, Homework, HomeworkStatus
 from learn.forms import TaskUpdateForm, ReviewUpdateForm
 from learn.meta import StudentLearnMeta, TutorLearnMeta, LearnMeta
-from learn.enums import HomeworkStatuses
+from learn.enums import HomeworkStatuses, PullRequestPolicies
 from user.models import Repo, Pull, User
 from user.utils import GithubApi
 
@@ -154,6 +153,38 @@ class AdminDashboardStatsView(LoginRequiredMixin, TemplateView):
                 "last_activity_homework": last_activity_homework,
             }
         )
+        return context
+
+
+class AdminDashboardProgressView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/admin_progress.html"
+    status = 'progress'
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        learn_meta = (
+            LearnMeta(user=self.request.user)
+            .get_teams()
+            .get_admin_progress()
+        )
+        context.update({"status": self.status, "learn_meta": learn_meta})
+        return context
+
+
+class TutorDashboardProgressView(LoginRequiredMixin, TemplateView):
+    template_name = "dashboard/tutor_progress.html"
+    status = 'progress'
+
+    def get_context_data(self, **kwargs: dict) -> dict:
+        context = super().get_context_data(**kwargs)
+        if isinstance(self.request.user, AnonymousUser):
+            return context
+        learn_meta = (
+            LearnMeta(user=self.request.user)
+            .get_teams()
+            .get_admin_progress(tutor=self.request.user)
+        )
+        context.update({"status": self.status, "learn_meta": learn_meta})
         return context
 
 
@@ -299,6 +330,9 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
                 "status_sending": self.request.GET.get("status_sending"),
                 "status_current": self.request.GET.get("status_current"),
                 "status": status,
+                "pr_policy": PullRequestPolicies[
+                    self.get_object().challenge.pull_request_policy
+                ],
             }
         )
         return context

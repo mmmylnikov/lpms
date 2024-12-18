@@ -1,9 +1,10 @@
-# ifneq (,$(wildcard .env))
-# 	$(info Found .env file.)
-# 	include .env
-# 	export
-# endif
+ifneq (,$(wildcard .env))
+  $(info Found .env file.)
+  include .env
+  export
+endif
 
+# CORE
 
 style:
 	flake8 lpms/
@@ -16,3 +17,11 @@ pre-commit-all:
 
 check:
 	make style types
+
+# TESTS
+
+pytest:
+	pytest lpms/
+
+test:
+	make style pytest

@@ -25,9 +25,12 @@
     {% endif %}
     
     <div class="mb-3">
-        <label for="InputRepo" class="form-label">{{ form.repo.label }}</label>
+        <label for="InputRepo" class="form-label">
+            {{ form.repo.label }}
+            <small class="fw-light"> | {{pr_policy.value.description}}</small>
+        </label>
         <div class="input-group mb-3">
-            {{ form.repo }}
+            {{ form.repo }} 
             {% if form.repo.value %}
             <span class="input-group-text" id="basic-addon1">
                 <i class="bi bi-github"></i>&nbsp;
@@ -43,7 +46,11 @@
         {% if request.method == 'POST' %}
         {% if form.repo.errors %}
         <div id="repoHelp" class="form-text text-danger">
-            {{ form.repo.errors }}
+            <ul>
+                {% for error in form.repo.errors %}
+                    <li>{{ error|linebreaks }}</li>
+                {% endfor %}
+            </ul>
         </div>
         {% else %}
         <div id="repoHelp" class="form-text">

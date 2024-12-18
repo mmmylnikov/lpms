@@ -30,10 +30,10 @@ class LessonAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
 
 class ChallengeAdmin(AddedFieldAdminMixin, ImportExportModelAdmin,
                      admin.ModelAdmin):
-    list_display = ('track', 'order', 'name', 'added')
+    list_display = ('track', 'order', 'name', 'added', 'pull_request_policy')
     list_display_links = ('name',)
-    list_editable = ('order', )
-    list_filter = ('track', 'track__course', )
+    list_editable = ('order', 'pull_request_policy')
+    list_filter = ('track', 'track__course', 'pull_request_policy')
     ordering = ('track', 'order', 'name')
 
 
