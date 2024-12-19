@@ -1,0 +1,129 @@
+{% load humanize %}
+
+<div class="card">
+    <div class="card-header  ">
+        <div class="row">
+            <div class="col">
+                Прогресс образовательного процесса
+                <span class="fw-lighter"></span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        {% for course, enrollments in learn_meta.admin_progress_header.items %}
+        <h3>{{course}}</h3>
+            {% for enrollment, learn in enrollments.items %}
+            <h4>{{enrollment}}</h4>
+            <p>
+                <small class="fw-light">Легенда: 
+                    <span class="badge text-bg-light fw-light">Доступно / Не выполняется</span>
+                    <span class="badge text-bg-secondary fw-light">🧑‍💻 Выполняется</span>
+                    <span class="badge text-bg-info fw-light">🔍 На ревью</span>
+                    <span class="badge text-bg-warning fw-light">⚠️ Требует исправления</span>
+                    <span class="badge text-bg-success fw-light">✅ Принято</span>
+                </small>
+            </p>
+            <div class="table-responsive">
+                <style>
+                    .fixed-column {
+                      position: sticky;
+                      left: 0;
+                      background-color: white;
+                      z-index: 1;
+                      min-width: 150px;
+                      max-width: 150px;
+                    }
+                  </style>
+                <table class="table table-striped table-hover table-sm table-bordered table-fixed">
+                    {% with weeks=learn.0 %}
+                    <thead>
+                        <th scope="col" class="text-end fixed-column">Недели</th>
+                        {% for week, tracks in weeks.items %}
+                        <th scope="col" colspan="{{tracks|length}}" class="text-center">{{week}}</th>
+                        {% endfor %}
+                    </thead>
+                    <thead>
+                        <th scope="col" class="text-end fixed-column">Трек</th>
+                        {% for week, tracks in weeks.items %}
+                            {% for track in tracks %}
+                            <td scope="col" class="text-center" style="min-width: 50px;">
+                                {{track}}
+                            </td>
+                            {% endfor %}
+                        {% endfor %}
+                    </thead>
+                    <thead>
+                        <th scope="col" class="text-end fixed-column">Задания<br>Студенты</th>
+                        {% for week, tracks in weeks.items %}
+                        <td scope="col" colspan="{{tracks|length}}" class="text-start">
+                            {% for track, challenges in tracks.items %}
+                                {% for challenge in challenges %}
+                                <small class="fw-lighter m-0 p-0 g-0">
+                                    <div class="row">
+                                        <div class="col">
+                                            <span class="badge text-bg-light fw-light" style="min-width: 45px;">
+                                                {{track}}{{forloop.counter}}
+                                            </span>
+                                            <span data-bs-toggle="tooltip" data-bs-title="{{challenge}}" data-bs-placement="right">
+                                                {{challenge|truncatechars:15}}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </small>
+                                {% endfor %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </thead>
+                    {% endwith %}
+                    {% with students=learn.1 %}
+                    <tbody class="table-group-divider">
+                        {% for student, weeks in students.items %}
+                        <tr>
+                            <td scope="col" class="text-end fixed-column fw-light">{{student}}</td>
+                            {% for week, tracks in weeks.items %}
+                            {% for track, challenges in tracks.items %}
+                            <td scope="col" class="text-start">
+                                {% for challenge in challenges %}
+                                <span data-bs-toggle="tooltip" data-bs-title="{{challenge.0}}" data-bs-placement="left"
+                                      style="min-width: 40px;" class="badge fw-light text-start
+                                        {% if challenge.1 == 'execution' %}
+                                        text-bg-secondary
+                                        {% elif challenge.1 == 'review' %}
+                                        text-bg-info
+                                        {% elif challenge.1 == 'correction' %}
+                                        text-bg-warning
+                                        {% elif challenge.1 == 'approved' %}
+                                        text-bg-success
+                                        {% else %}
+                                        text-bg-light
+                                        {% endif %}
+                                      ">
+                                    <small>
+                                    {{track}}{{forloop.counter}}
+                                    {% if challenge.1 == 'execution' %}
+                                    🧑‍💻
+                                    {% elif challenge.1 == 'review' %}
+                                    🔍
+                                    {% elif challenge.1 == 'correction' %}
+                                    ⚠️
+                                    {% elif challenge.1 == 'approved' %}
+                                    ✅
+                                    {% endif %}
+                                    </small>
+                                </span>
+                                {% endfor %}
+                            </td>
+                            {% endfor %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endwith %}
+                </table>
+            </div>
+            <hr>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>

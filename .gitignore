@@ -7,6 +7,7 @@ lpms/static/placeholders/
 # static
 lpms/static/favicons/
 lpms/static/logo/
+lpms/static/lessons/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

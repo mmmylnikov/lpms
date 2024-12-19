@@ -4,6 +4,8 @@ from typing import Self
 from allauth.socialaccount.models import SocialAccount
 from django.db.models import QuerySet
 from django.contrib.auth.models import AnonymousUser
+from django.db import connection
+
 
 from user.models import User
 from course.models import Team, Enrollment, Course, Track
@@ -16,6 +18,7 @@ from learn.models import (
     HomeworkStatus,
 )
 from learn.enums import HomeworkStatuses
+from learn.sql import admin_progress_header, admin_progress_body
 
 
 class LearnMeta:
@@ -243,6 +246,91 @@ class LearnMeta:
         self.admin_stats = admin_stats
         return self
 
+    def get_admin_progress(self, tutor: User | None = None) -> Self:
+        if isinstance(self.user, AnonymousUser):
+            return self
+        ap: dict = {}
+
+        with connection.cursor() as cursor:
+            cursor.execute(admin_progress_header)
+            columns = [col.name for col in cursor.description]
+            admin_header = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
+            cursor.execute(admin_progress_body)
+            columns = [col.name for col in cursor.description]
+            admin_body = [
+                dict(zip(columns, row))
+                for row in cursor.fetchall()
+            ]
+
+        for row in admin_header:
+            course_name = row["course_name"]
+            course_slug = "".join(
+                [w[0].upper() for w in course_name.split(" ")]
+            )
+            tutor_id = row["tutor_id"]
+            if tutor and tutor_id != tutor.pk:
+                continue
+            enrollment_name = (
+                f'{course_slug} {row["enrollment_num"]} ({row["tutor"]})'
+            )
+            week_num = row["week_num"]
+            track_name = row["track_name"]
+            challenge_name = row["challenge_name"]
+            track_slug = "".join([w[0].upper() for w in track_name.split(" ")])
+            if not ap.get(course_name):
+                ap[course_name] = {}
+            if not ap[course_name].get(enrollment_name):
+                ap[course_name][enrollment_name] = [{}, {}]
+            if not ap[course_name][enrollment_name][0].get(week_num):
+                ap[course_name][enrollment_name][0][week_num] = {}
+            if not ap[course_name][enrollment_name][0][week_num].get(
+                track_slug
+            ):
+                ap[course_name][enrollment_name][0][week_num][track_slug] = []
+            if not challenge_name:
+                continue
+            ap[course_name][enrollment_name][0][week_num][track_slug].append(
+                challenge_name
+            )
+
+        for row in admin_body:
+            course_name = row["course_name"]
+            course_slug = "".join(
+                [w[0].upper() for w in course_name.split(" ")]
+            )
+            tutor_id = row["tutor_id"]
+            if tutor and tutor_id != tutor.pk:
+                continue
+            enrollment_name = (
+                f'{course_slug} {row["enrollment_num"]} ({row["tutor"]})'
+            )
+            week_num = row["week_num"]
+            track_name = row["track_name"]
+            challenge_name = row["challenge_name"]
+            track_slug = "".join([w[0].upper() for w in track_name.split(" ")])
+            student = row["student"]
+            status = row["status"]
+            if not ap[course_name][enrollment_name][1].get(student):
+                ap[course_name][enrollment_name][1][student] = {}
+            if not ap[course_name][enrollment_name][1][student].get(week_num):
+                ap[course_name][enrollment_name][1][student][week_num] = {}
+            if not ap[course_name][enrollment_name][1][student][week_num].get(
+                track_slug
+            ):
+                ap[course_name][enrollment_name][1][student][week_num][
+                    track_slug
+                ] = []
+            if not challenge_name:
+                continue
+            ap[course_name][enrollment_name][1][student][week_num][
+                track_slug
+            ].append([challenge_name, status])
+        self.admin_progress_header = ap
+        return self
+
 
 class StudentLearnMeta(LearnMeta):
     # course
@@ -386,6 +474,7 @@ class StudentLearnMeta(LearnMeta):
 class TutorLearnMeta(StudentLearnMeta):
     # review
     students: dict[User, SocialAccount]
+    students_unpermitted: list[User]
     week_reviews: (
         dict[User, list[tuple[Homework | None, HomeworkStatus | None]]] | None
     ) = None
@@ -398,10 +487,14 @@ class TutorLearnMeta(StudentLearnMeta):
         self.get_week_reviews()
 
     def get_students(self) -> None:
+        students_unpermitted = list(self.team.students.all())
         accounts = SocialAccount.objects.filter(
-            user__in=list(self.team.students.all())
+            user__in=students_unpermitted
         ).select_related("user")
         self.students = {account.user: account for account in accounts}
+        for student in self.students:
+            students_unpermitted.remove(student)
+        self.students_unpermitted = students_unpermitted
 
     def get_week_reviews(self) -> None:
         if isinstance(self.user, AnonymousUser):

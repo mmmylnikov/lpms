@@ -59,3 +59,41 @@ class HomeworkStatuses(Enum):
         icon="bi bi-check-square",
         color="success",
     )
+
+
+@dataclass(kw_only=True, slots=True)
+class PullRequestPolicy:
+    name: str
+    label: str
+    description: str
+    url_pattern: str
+
+
+class PullRequestPolicies(Enum):
+    own_repo = PullRequestPolicy(
+        name="own_repo",
+        label="Личный репозиторий",
+        description="PR только в свой репозиторий",
+        url_pattern=(
+            "https://github.com/{username}/"
+            "<repo_name>/pull/<pull_num>"
+            ),
+    )
+    any_repo_except_task = PullRequestPolicy(
+        name="any_repo_except_task",
+        label="Любой репозиторий, кроме репозитория задания",
+        description="PR в любой репозиторий, кроме репозитория задания",
+        url_pattern=(
+            "https://github.com/{username}/"
+            "<repo_name>/pull/<pull_num>"
+            ),
+    )
+    any_repo = PullRequestPolicy(
+        name="any_repo",
+        label="Любой репозиторий",
+        description="PR в любой репозиторий",
+        url_pattern=(
+            "https://github.com/<username>/"
+            "<repo_name>/pull/<pull_num>"
+            ),
+    )
