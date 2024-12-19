@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
 
 from config import settings
-
+from backends.utils import trigger_error
 
 handler400 = 'course.views.handler_400_view'
 handler403 = 'course.views.handler_403_view'
@@ -27,6 +27,9 @@ urlpatterns = [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += [path('debug/sentry/', trigger_error)]  # type: ignore
 
 admin.site.site_header = "Панель администрирования LPMS"
 admin.site.index_title = "LPMS | Администрирование портала"
