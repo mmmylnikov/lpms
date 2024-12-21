@@ -1,10 +1,23 @@
 import json
 from os import getenv
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
+
+
+sentry_sdk.init(
+    dsn=getenv('SENTRY_DSN'),
+    integrations=[DjangoIntegration()],
+    auto_session_tracking=getenv("SENTRY_AUTO_SESSION_TRACKING", 'False').lower() in ('true', '1'),
+    traces_sample_rate=float(getenv("SENTRY_TRACES_SAMPLE_RATE", '0.01')),
+    release=getenv('RELEASE', 'unknown'),
+    environment=getenv('SENTRY_ENVIRONMENT', 'dev'),
+)
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
